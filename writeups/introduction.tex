@@ -1,0 +1,18 @@
+\section{Introduction}
+
+For a lot of applications both in Mathematics and Computer Science where a
+specific logic is needed, First-order Logic (FOL) is the logic of choice, as it is,
+in some sense, the most expressive logic for which there is a complete calculus.
+However, this comes at the expense of not being able to express certain math-
+ematical concepts (like partial functions) elegantly. 
+There are a lot of possible ways to improve this situation. One possibility would be to move to Higher-Order Logics. However by doing this we loose a number of desired theoretical properties (most importantly the existence of a complete calculus) and the fairly large amount of computer support that has been developed for First-Order-Logic.So the most widely studied and realised approach is to adapt or extend FOL.
+Here again there are many possibilities, from including partial functions %find source, cite
+to using sorts %find source, cite.
+Many of these extensions have been extremely well studied, % maybe cite DFKI orthogonal features paper here?  
+but somewhat surprisingly one possibility that is prevalent in informal Mathematics has received relatively little attention:
+Phrases like "let x be the unique element such that P(x) holds" are very widespread in mathematical textbooks and papers alike, but can not be formalized in pure FOL.\\
+ We can extend FOL by the $\delta$-operator, an operator that for any sentence of the form $\exists! x:P (x)$ allows us to obtain the witness $x$.
+ 
+
+The general goals for this Guided Research is to formally define, write up and
+investigate this extension of FOL.

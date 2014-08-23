@@ -1,0 +1,153 @@
+\documentclass{elsarticle}
+\usepackage{graphicx,url,wrapfig,array}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{tikz}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage[T1]{fontenc}
+\usepackage{wrapfig}
+\usepackage{mathtools}
+\usepackage{multicol}
+\usepackage{stmaryrd}
+\usepackage{backnaur}
+
+\title{An extension of FOL by a $\delta$-Operator$
+\author{Timo Luecke}
+
+\begin{document}
+\maketitle
+
+
+\tableofcontents
+
+\begin{abstract}
+
+\end{abstract}
+
+
+
+\section{Introduction}
+
+
+
+
+\section{Preliminaries}
+In this section, we will introduce first-order logic in order to give an overview of the definitions and notations we will use. These definitions are taken from %cite folsound here
+and expanded where necessary.
+
+\subsection{First-Order-Logic}
+
+\begin{definition}{sig}{Signatures}
+A FOL-\emph{signature} is a triple $(\Sigma_f,\Sigma_p,\arit)$ where $\Sigma_f$ and $\Sigma_p$ are disjoint sets of function and predicate symbols, respectively, and $\arit:\Sigma_f\cup\Sigma_p\arr\N$ assigns arities to symbols. We will treat constants and boolean variables as the special case of arity $0$.
+\end{definition}
+
+%\begin{definition}[Expressions]\label{def:folexpr}
+A FOL-\emph{context} is a list of variables.
+For a signature $\Sigma$ and a context $\Gamma$, the \emph{terms} over $\Sigma$ and $\Gamma$ are formed from the variables in $\Gamma$ and the application of function symbols $f\in\Sigma_f$ to terms according to $\arit(f)$ (see the Backus-Naur-Form below).
+The \emph{formulas} over $\Sigma$ and $\Gamma$ are formed from the application of predicate symbols $p\in\Sigma_p$ to a number of terms according to $\arit(p)$ as well as $\doteq$, $\true$, $\false$, $\neg$, $\wedge$, $\vee$, $\impl$, $\forall$, and $\exists $ in the usual way (see the BNF below).
+In addition we define $\exists! x.P(x) := \exists z.P(x)\wedge (\forall y. (P(y)\impl y\doteq x)).
+
+\begin{bnf}
+	\bnfprod{term}
+		{\bnfpn{var} \bnfor \bnfpn{const} \bnfor {\bnfpn{f(term,term, ... term) (f \in\Sigma_f, \arit(f) terms)}}}
+	\bnfprod{form}
+		{\bnfpn{
+	
+Formulas in the empty context are called $\Sigma$-\emph{sentences}, and we write $\Sen(\Sigma)$ for the set of sentences.
+\end{definition}
+
+\begin{definition}[Theories]\label{def:thy}
+A FOL-\emph{theory} is a pair $(\Sigma,\Theta)$ for a signature $\Sigma$ and a set $\Theta \subseteq \Sen(\Sigma)$ of \emph{axioms}.
+\end{definition}
+
+\begin{definition}[Signature Morphisms]
+Given two signatures $\Sigma=(\Sigma_f,\Sigma_p,\arit)$ and $\Sigma'=(\Sigma'_f,\Sigma'_p,\arit')$, a FOL-\emph{signature morphism} $\sigma:\Sigma\arr\Sigma'$ is an arity-preserving mapping from $\Sigma_f$ to $\Sigma'_f$ and from $\Sigma_p$ to $\Sigma'_p$.
+
+The \emph{homomorphic extension} of $\sigma$ -- which we also denote by $\sigma$ -- is the mapping from terms and formulas over $\Sigma$ to terms and formulas over $\Sigma'$ that replaces every symbol $s\in\Sigma_f\cup\Sigma_p$ with $\sigma(s)$. The \emph{sentence translation}\linebreak $\Sen(\sigma):\Sen(\Sigma)\arr\Sen(\Sigma')$ arises as the special case of applying $\sigma$ to sentences.
+\end{definition}
+
+\begin{example}[Monoids and Groups]\label{ex:mongr}
+We will use the theories $\monoid = (\Monsig,\linebreak \Monax)$ and $\group=(\Grsig,\Grax)$ of monoids and groups as running examples. $\Monsig_f$ is the set $\{\circ,e\}$ where $\circ$ is binary (written infix) and $e$ is nullary, and $\Monsig_p$ is empty. $\Monax$ consists of the axioms for
+\begin{itemize}
+\item associativity: $\forall x\;\forall y\;\forall z\;x\circ (y\circ z) \doteq (x\circ y)\circ z$,
+\item left-neutrality: $\forall x\;e\circ x \doteq x$,
+\item right-neutrality: $\forall x\;x\circ e \doteq x$.
+\end{itemize}
+The theory $\group$ extends $\monoid$, i.e., $\Grsig$ adds a unary function symbol $\inv$ (written as superscript $^{-1}$) to $\Monsig$, and $\Grax$ adds axioms to $\Monax$ for the following:
+\begin{itemize}
+\item left-inverseness: $\forall x\;x^{-1}\circ x \doteq e$, 
+\item right-inverseness: $\forall x\;x\circ x^{-1} \doteq e$.
+\end{itemize}
+
+The inclusion mapping $\mongr$ is a signature morphism from $\Monsig$ to $\Grsig$. 
+%It is also a theory morphism from $\monoid$ to $\group$.
+\end{example}
+
+There are various ways to define the \emph{proof theory} of FOL. In this paper we choose the natural deduction calculus (\ND) with introduction and elimination rules. We will use the phrase \emph{proof theoretical semantics} when speaking about the induced provability relation; we will not consider proof normalization, which some authors mean when using that phrase.
+
+\input{fol-pf}
+
+\begin{definition}[Proof Theoretical Theorems]
+Given a theory $(\Sigma,\Theta)$, we say that $F\in\Sen(\Sigma)$ is a \emph{proof theoretical theorem} of $(\Sigma,\Theta)$ if the judgment $\iscons{\Sigma}{F_1,\ldots,F_n}{F}$ is derivable for some $\{F_1,\ldots,F_n\}\sq\Theta$ using the calculus shown in Fig.~\ref{fig:fol:nd}. We write this as $\iscons{\Sigma}{\Theta}{F}$.
+\end{definition}
+
+\begin{definition}[Proof Theoretical Theory Morphisms]
+A signature morphism from $\Sigma$ to $\Sigma'$ is a \emph{proof theoretical theory morphism} from $(\Sigma,\Theta)$ to $(\Sigma',\Theta')$, written  $\pmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$, if $\Sen(\sigma)$ maps the axioms of $(\Sigma,\Theta)$ to proof theoretical theorems of $(\Sigma',\Theta')$, i.e., for all $F\in\Theta$,
+$\iscons{\Sigma'}{\Theta'}{\Sen({\sigma})(F)}$ holds.
+\end{definition}
+
+\begin{lemma}[Proof Translation]
+Assume a proof theoretical theory morphism\linebreak
+$\sigma:(\Sigma,\Theta)\arr(\Sigma',\Theta')$. If $F$ is a proof theoretical theorem of $(\Sigma,\Theta)$, then $\Sen(\sigma)(F)$ is a proof theoretical theorem of $(\Sigma',\Theta')$. In other words, provability is preserved along proof theoretical theory morphisms.
+\end{lemma}
+
+We develop the \emph{model theory} of FOL as an institution (\cite{institutions}).
+
+\begin{definition}[Models of a FOL-Signature]\label{def:model}
+A FOL-\emph{model of a signature} $\Sigma$ is a pair $(\U,\I)$ where $\U$ is a non-empty set (called the \emph{universe}) and $\I$ is an interpretation function of $\Sigma$-symbols such that
+\begin{itemize}
+\item $f^\I\in\U^{\U^n}$ for $f\in \Sigma_f$ with $\arit(f)=n$,
+\item $p^\I\subseteq \U^n$ for $p\in \Sigma_p$ with $\arit(p) = n$.
+\end{itemize}
+We write $\Mod(\Sigma)$ for the class of $\Sigma$-models.
+\end{definition}
+
+\begin{definition}[Model Theoretical Semantics]\label{def:semantics}
+Assume a signature $\Sigma$, a context $\Gamma$, and a $\Sigma$-model $\M=(\U,\I)$. An \emph{assignment} is a mapping from $\Gamma$ to $\U$. For an assignment $\alpha$, the \emph{interpretations} $\semm{t}{\M,\alpha}\in\U$ of terms $t$ and $\semm{F}{\M,\alpha}\in\{0,1\}$ of formulas $F$ over $\Sigma$ and $\Gamma$ are defined in the usual way by induction on the syntax.
+Given a sentence $F$, we write $\moda{\M}{\Sigma}{F}$ if $\semm{F}{\M}=1$.
+
+Given a theory $(\Sigma,\Theta)$, we write the class of $(\Sigma,\Theta)$-models as
+\[\Mod(\Sigma,\Theta) = \{M\in \Mod(\Sigma)\,|\,\moda{M}{\Sigma}{F} \textrm{ for all } F\in\Theta\}.\]
+\end{definition}
+
+\begin{definition}[Model Theoretical Theorems]
+Given a theory $(\Sigma,\Theta)$, we say that $F\in\Sen(\Sigma)$ is a \emph{model theoretical theorem} of $(\Sigma,\Theta)$ if the following holds for all $\Sigma$-models $\M$: If $\moda{\M}{\Sigma}{A}$ for all $A\in\Theta$, then also $\moda{\M}{\Sigma}{F}$. We write this as $\moda{\Theta}{\Sigma}{F}$.
+\end{definition}
+
+\begin{definition}[Model Reduction]
+Given a signature morphism $\sigma:\Sigma\arr\Sigma'$ and a $\Sigma'$-model $\M'=(\U,\I')$, we obtain a $\Sigma$-model $(\U,\I)$, called the \emph{model reduct} of $M'$ along $\sigma$, by putting $s^{\I}=\sigma(s)^{\I'}$ for all symbols of $\Sigma$. We write $\Mod(\sigma):\Mod(\Sigma')\arr\Mod(\Sigma)$ for the induced model reduction.
+\end{definition}
+
+\begin{definition}[Model Theoretical Theory Morphisms]
+Given two theories $(\Sigma,\Theta)$ and $(\Sigma',\Theta')$, a \emph{model theoretical theory morphism} from $(\Sigma,\Theta)$ to $(\Sigma',\Theta')$, written  $\mmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$, is a signature morphism from $\Sigma$ to $\Sigma'$ such that $\Mod(\sigma)$ reduces models of $(\Sigma',\Theta')$ to models of $(\Sigma,\Theta)$, i.e, for all $M'\in \Mod(\Sigma',\Theta')$, we have $\Mod(\sigma)(M')\in\Mod(\Sigma,\Theta)$.
+\end{definition}
+
+\begin{lemma}[Satisfaction Condition]
+Assume a FOL-signature morphism\linebreak 
+$\sigma:\Sigma\arr\Sigma'$, a $\Sigma$-sentence $F$, and a $\Sigma'$-model $\M'$. Then $\moda{\M'}{\Sigma'}{\Sen(\sigma)(F)}$ iff $\moda{\Mod(\sigma)(\M')}{\Sigma}{F}$.
+\end{lemma}
+
+\begin{example}[Continued]\label{ex:monmod}
+The integers form a model $Int=(\Z,+,0,-)$ for the theory of groups (where we use a tuple notation to give the universe and the interpretations of $\circ$, $e$, and $\inv$, respectively). The model reduction\linebreak
+ $\Mod(\mongr)(Int)=(\Z,+,0)$ along $\mongr$ yields the integers seen as a model of the theory of monoids.
+\end{example}
+
+We have given both proof theoretical and model theoretical definitions of \emph{theorem} and \emph{theory morphism}. In general, these must be distinguished to avoid a bias towards proof or model theory. However, they coincide if a logic is sound and complete:
+\begin{theorem}[Soundness and Completeness]
+Assume a FOL-theory $(\Sigma,\Theta)$ and a $\Sigma$-sentence $F$. Then $\iscons{\Sigma}{\Theta}{F}$ iff $\moda{\Theta}{\Sigma}{F}$. Therefore, for a FOL-signature morphism $\sigma:\Sigma\arr\Sigma'$, we have $\pmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$ iff $\mmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$.
+\end{theorem}
+
+\subsection{LF}
+
+
+\end{document}

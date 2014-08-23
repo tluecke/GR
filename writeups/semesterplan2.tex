@@ -1,0 +1,77 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+
+%opening
+\title{Semester Plan GR 2}
+\author{Timo Lücke}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+For a lot of applications both in Mathematics and Computer Science where a specific 
+logic is needed, First-order Logic (FOL) is the logic of choice, as it is, in some sense,
+the most expressive logic for which there is a complete calculus.
+However, this comes at the expense of being unable to elegantly express certain mathematical 
+concepts (like the description operator or partial functions) or theorems (e.g. the theorem that a field without zero
+is a multiplicative group). \\
+% this is basically a paraphrasation of your description of the topic at http://trac.kwarc.info/MMT/ticket/45
+% is this acceptable at all and if it is would I need to reference it here?
+This situation can be improved by extending FOL with certain concepts. 
+Many such extensions have been studied extensively. We will present an extension of FOL by a description operator.
+The description operator allows us to obtain for every proven statement of the form $\exists x . P(x)$ a witness $x$. This is done by allowing proofs to occur in terms.\\
+The goals for this Guided Research is to formally define and investigate this extension of FOL. 
+
+
+\section{Prior Work}
+The formal definition of the logic will be done both on paper and in the Edinburgh Logical Framework (LF) \cite{HHP93}.
+LF is a type-theoretical framework based on dependent type theory and is used to represent syntax, model theory and proof theory in logics.
+Specifically the planned work in LF is an extension of \cite{HR11} where such an encoding is described for standard FOL.
+
+We will work out the encodings of both the logic itself and the case studies in the MMT system \cite{RK13}. The MMT system is a modular mathematical knowledge management system.
+
+In the first semester we defined the logic, gave the general ideas for the necessary proofs and provided a small-scale example.
+
+\section{Work Plan}
+The planned work is divided into three work packages as described below.\\
+
+\begin{tabular}{|p{3.5cm}|p{5cm}|}
+\hline
+Work Package & Planned Date of Completion\\
+\hline
+Formal Definition & 4.4.\\
+Case Studies & 2.5.\\
+Choice Operator & 15.5.(?)\\
+\hline
+\end{tabular}
+
+\paragraph{Formal definition}
+In the first semester we defined the logic and conjectured a number of theorems. Specifically we conjectured that the defined calculus is sound and complete and that our translation procedure is solid and complete. Our first work package for this semester is to work out the formal proofs for these conjectures. 
+
+\paragraph{Case Studies}
+We will evaluate our logic by applying it in several case studies. 
+These case studies fulfill two functions: they evaluate our definition and are themselves significant contributions to formal logic, as they are formalizations of fundamental mathematical theories that have not been able to be elegantly formalized up until now. 
+
+Specifically we will develop a description of naive set theory, work out an encoding for basic abstract algebra and give some other miscellaneous examples.
+
+Due to the fact that the there are so far no proof-assistance tools for the necessary proofs in terms, this will require a lot of manual work for the formulation of these proofs in a formal proof calculus. Here we will make use the MMT system to proof-check our encodings, thus ensuring correctness. This is highly non-trivial, since proofs occurring in terms is something that most systems can not deal with. Deliverables for this work package would be the successfully MMT-compiled encodings for the listed case studies.
+
+\paragraph{Choice Operator} So far our work has been focused on the description operator which acts on statements of unique existence. The choice operator acts like the description operator, but on statements of existence. If time allows, we will extend the general idea of using proofs in terms in order to provide an elegant formalization of the choice operator analog to our treatment of the description operator. It is clear that we would need the axiom of choice in order to construct the model theory in this case.
+
+ This work package is somewhat more open, but the first tasks would be the extension of our formal definitions and theorems to include the choice operator.\\
+
+
+
+\begin{thebibliography}{9}
+\bibitem{HHP93} 
+  R.Harper, F.Honsell and G.Plotkin. A framework for defining logics.
+  \emph{Journal of the Association for Computing Machinery}, 40(1):143-185, 1993.
+\bibitem{HR11} F.Horozal, F.Rabe. Representing Model theory in a type-theoretical framework
+  \emph{Theoretical Computer Science}
+  Volume 412, Issue 37, 26 August 2011, Pages 4919–4945, 2011.
+\bibitem{RK13} F.Rabe, M.Kohlhase. A scalable module system. 
+  \emph{Information and Computation} Volume 230, September 2013, Pages 1–54, 2013.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,64 @@
+namespace http://cds.omdoc.org/GR
+
+theory Sets : http://cds.omdoc.org/urtheories?LF =
+  include ?FOLd
+  implchain : {A,B,C} ded (A ⇒ B) → ded(B ⇒ C) → ded(A ⇒ C) 
+  	= [A,B,C][p: ded A ⇒ B][q: ded B ⇒ C] impI [x: ded A] impE q (impE p x)
+  
+  equivchain: {A,B,C} ded (A ⇔ B) → ded(B ⇔ C) → ded(A ⇔ C) 
+  = [A,B,C][p: ded A ⇔ B, q: ded B ⇔ C] 
+  equivI ([x: ded A] equivEl q (equivEl p x))
+         ([y: ded C] equivEr p (equivEr q y))
+
+  equivsym: {A,B} ded (A ⇔ B) → ded (B ⇔ A) 
+  = [A,B][p] 
+  equivI ([x] equivEr p x)
+         ([x] equivEl p x)
+
+  in : i → i → form # 1 ‍∈ 2 
+  subset: i → i → form = [A,B] forall ([x] ((x ‍∈ A) ⇒ (x ‍∈ B)))
+  
+  extensionality : {x,y} ded (forall [z] (in z x) ⇔ (in z y))  →  ded x == y
+  
+  isempty : i → form = [x]  ¬ exists [y] in y x
+  emptyAx : ded exists [x] isempty x
+  empty : i= delta ([x] isempty x) 
+             (exUI emptyAx 
+              ([A,B] [P: ded isempty A, Q: ded isempty B] 
+              extensionality faI ([z] equivI 
+                ([p: ded z ‍∈ A] contra(negE P (exI p z) ) (z ‍∈ B) )
+                ([q: ded z ‍∈ B] contra(negE Q (exI q z) ) (z ‍∈ A) ))))  
+  	
+  ispowerset: i → i → form = [A,B]	forall [x] ((subset x A)  ⇔  (in x B))			
+  powersetAx: ded forall [A] exists [B] ispowerset A B   
+  powerset: i → i = [A] delta ([P] ispowerset A P) 
+  					(exUI (faE powersetAx A)
+  					([U,V] [Q: ded ispowerset A U, R: ded ispowerset A V]
+  					extensionality (faI [x] (equivchain (equivsym (faE Q x)) (faE R x) ))))
+  
+  isunion: i → i → form= [A, U]	forall [x] ((exists ([a] (a ‍∈ A) ∧ (x ‍∈ a))) ⇔ in x U)				
+  unionAx: ded forall [A] exists [U] (isunion A U)
+  union: i → i = 
+  				[A] delta ([U] isunion A U) 
+  				(exUI (faE unionAx A) (
+  				[U,V, P: ded isunion A U, Q: ded isunion A V]
+  				extensionality (faI [x] (equivchain (equivsym (faE P x)) (faE Q x) ))))
+   					
+  comprehensionAx: {A,F:i → form} ded exists [C] forall [x] ((x ‍∈ C) ⇔ ((x ‍∈ A) ∧ (F x)))
+  
+  ispairof: i → i → i → form= [a,b,J] forall [z] (z == a ∨ z == b) ⇔ (in z J)
+  unpairAx: ded forall[x] forall[y] exists [A] ispairof x y A   
+  unpair: i → i → i= [a,b] delta ([J] ispairof a b J) 
+  				(exUI (faE(faE unpairAx a) b) (
+  				[J,K, P: ded ispairof a b J, Q: ded ispairof a b K]
+  				extensionality (faI [x] (equivchain (equivsym (faE P x)) (faE Q x) ))))
+   				
+  binunion : i → i → i = [x][y] union (unpair x y)# 1 ∪ 2
+  singleton : i → i = [x] unpair x x
+
+  zero: i  = empty
+  succ: i → i  = [x] x ∪ (singleton x)
+  natnumAx: ded exists [N] (in zero N) ∧ (forall [x] (in x N) ⇒ (in (succ(x)) N))
+
+
+

@@ -1,0 +1,15 @@
+namespace http://cds.omdoc.org/GR
+
+//   FOL +description with natural deduction rules 
+
+theory FOLd : http://cds.omdoc.org/urtheories?LF =
+  include ?FOLNatDed
+  delta : {f: i → form} ded existsU f → i   # delta 1 2 prec 27    
+  deltaax : {A,P: ded (existsU A)} ded (A (delta A P)) 
+
+  proofir : {A: i → form,P: ded existsU [x] A x, Q: ded existsU [y] A y} ded (delta A P) == (delta A Q)
+  				
+  = [A,P,Q]  (impE  (impE (faE (faE (andEr (exUE P)) (delta A P)) delta A Q) (deltaax A P)) deltaax A Q)   
+
+  				
+

@@ -1,0 +1,13 @@
+\contentsline {section}{\numberline {1}Introduction and Related Work}{2}{section.1}
+\contentsline {paragraph}{Related Work}{3}{section*.2}
+\contentsline {paragraph}{Methods}{3}{section*.3}
+\contentsline {paragraph}{Outline}{4}{section*.4}
+\contentsline {section}{\numberline {2}Preliminaries}{4}{section.2}
+\contentsline {subsection}{\numberline {2.1}First-Order-Logic}{4}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}The Edinburgh Logical Framework}{8}{subsection.2.2}
+\contentsline {section}{\numberline {3}A Description Operator for FOL}{9}{section.3}
+\contentsline {subsection}{\numberline {3.1}Syntax and Proof theory}{10}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Model Theory}{11}{subsection.3.2}
+\contentsline {section}{\numberline {4}A Formalization of Set Thery}{12}{section.4}
+\contentsline {section}{\numberline {5}Meta-Logical Properties}{13}{section.5}
+\contentsline {section}{\numberline {6}Conclusion}{15}{section.6}

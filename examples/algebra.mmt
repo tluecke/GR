@@ -1,0 +1,27 @@
+namespace http://cds.omdoc.org/GR
+
+theory Monoid : http://cds.omdoc.org/urtheories?LF =        
+  include ?FOLd
+  comp : i → i → i		# 1 ∗ 2 prec 15
+
+  assoc : {a,b,c} ded ((a ∗ b) ∗ c) == (a ∗ (b ∗ c))
+ 
+  
+
+  isunit: i → form= [e] forall[x] (e ∗ x)== x ∧ ((x ∗ e) == x) 
+  unitex : ded exists [x] isunit x
+  unitunique : {x,y} (ded isunit x) → (ded isunit y) → (ded x==y)=
+        [x, y, P: ded isunit x, Q: ded isunit y] 
+         eqtrans (eqref (x ∗ y)) (faE (andEl P) y) 
+ 
+  e : i = delta ([x] forall [y] (comp x y) == y) (exUI (unitex) (unitunique))
+
+
+theory Group : http://cds.omdoc.org/urtheories?LF = 
+  include ?Monoid
+  isinverse :  {x,y} i → i → form= [x,y] (x ∗ y) == e
+  inverse : ded forall [x] exists [y] (x ∗ y) == e
+  inv : i → i
+
+ 
+

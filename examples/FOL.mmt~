@@ -1,0 +1,74 @@
+namespace http://cds.omdoc.org/GR
+
+//   intuitionistic FOL with natural deduction rules 
+
+theory FOL : http://cds.omdoc.org/urtheories?LF =
+ 
+  form  : type 
+  i 	: type 
+  ded   : form → type          # ded 1  prec 0role Judgment
+  contra : type  = {a} ded a # ↯            
+  contraE : {A} ↯ → ded A = [A,c] c A
+  
+  eq 	: i → i → form # 1 == 2 prec 25 
+  true  : form                                  
+  false : form 					
+  and   : form → form → form   # 1 ∧ 2 prec 15
+  or    : form → form → form   # 1 ∨ 2 prec 15
+  impl  : form → form → form   # 1 ⇒ 2 prec 10
+  neg   : form → form          # ¬ 1   prec 20
+  equiv : form → form → form   # 1 ⇔ 2 prec 10
+        = [x,y] (x ⇒ y) ∧ (y ⇒ x)
+  
+  forall : (i → form) → form   # forall 1 prec 30
+  exists : (i → form) → form   # exists 1 prec 30
+ 
+  existsU : (i → form) → form   # existsU 1 prec 30
+  			= [A] exists [x] (A x) ∧ forall [y] (A y) ⇒ y == x 
+  
+
+
+theory FOLNatDed : http://cds.omdoc.org/urtheories?LF =
+  include ?FOL  
+
+  trueI : ded true
+  
+  eqsym : {x,y} ded x==y → ded y==x
+  eqtrans: {x,y,z} ded x==y → ded y==z → ded x==z
+  eqref : {x} ded x==x
+
+  andI  : {A,B} ded A → ded B → ded A ∧ B   
+  andEl : {A,B} ded A ∧ B → ded A           
+  andEr : {A,B} ded A ∧ B → ded B           
+
+  orIl  : {A,B} ded A → ded A ∨ B           
+  orIr  : {A,B} ded B → ded A ∨ B           
+  orE   : {A,B,C} ded A ∨ B → (ded A → ded C) → (ded B → ded C) → ded C
+
+  impI  : {A,B} (ded A → ded B) → ded A ⇒ B 
+  impE  : {A,B} ded A ⇒ B → ded A → ded B   
+
+  negI  : {A} (ded A → ↯) → ded ¬ A   
+  negE  : {A} ded ¬ A → ded A → ↯     
+
+  equivI : {A,B} (ded A → ded B) → (ded B → ded A) → ded A ⇔ B  
+         = [A,B,p,q] andI (impI [x:ded A] p x) (impI [x] q x)  
+
+  equivEl : {A,B} ded A ⇔ B → ded A → ded B 
+          = [A,B,p,a] impE (andEl p) a 
+          
+  equivEr : {A,B} ded A ⇔ B → ded B → ded A 
+          = [A,B,p,b] impE (andEr p) b 
+
+  faI :  {A} ({x: i} ded (A x)) → ded (forall [x] A x)          
+  faE :  {A} ded (forall [x: i] A x) → {c:i} ded (A c)  
+    
+  exI : {A,c} ded (A c) → ded exists [x] A x 
+  exE : {A,B} ded (exists [x] A x) → ({c} ded (A c) → ded B) → ded B  
+
+  exUI : {A} ded (exists [x] A x) → ({x,y} ded (A x) → ded (A y) → ded x == y) → ded existsU [x] A x
+  exUE : {A} ded existsU ([x] A x) → ded (exists [x] A x) ∧ forall [x] forall[y] (A x) ⇒ ((A y) ⇒ x == y) 
+  
+  tnd : {a} ded a ∨ ¬ a
+
+

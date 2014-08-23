@@ -1,0 +1,77 @@
+\newcommand{\FORM}{\mathtt{form}}
+\newcommand{\TERM}{\mathtt{term}}
+\newcommand{\VAR}{V\!AR}
+\newcommand{\false}{\op{false}}
+\newcommand{\true}{\op{true}}
+\newcommand{\arit}{\op{ar}}
+\newcommand{\isterm}[4][]{#3\der^{#1}_{#2}#4:\TERM}
+\newcommand{\istermS}[2]{\isterm{\Sigma}{#1}{#2}}
+\newcommand{\istermSG}[1]{\isterm{\Sigma}{\Gamma}{#1}}
+\newcommand{\isform}[4][]{#3\der^{#1}_{#2}#4:\FORM}
+\newcommand{\isformS}[2]{\isform{\Sigma}{#1}{#2}}
+\newcommand{\isformSG}[1]{\isform{\Sigma}{\Gamma}{#1}}
+\newcommand{\sub}[2]{#1/#2}
+
+\newcommand{\gSigma}{{\color{gray}\Sigma}}
+\newcommand{\gDelta}{{\color{gray}\Delta}}
+\newcommand{\gGamma}{{\color{gray}\Gamma}}
+\newcommand{\iscons}[5][]{#3;#4\der^{#1}_{#2}#5}
+\newcommand{\isconsgSGD}[1]{\iscons{\gSigma}{\gGamma}{\gDelta}{#1}}
+
+\newcommand{\STT}{{\mathcal{STT}}}
+\newcommand{\HOL}{{\mathcal{HOL}}}
+%\newcommand{\SIG}{\mathtt{Sig}}
+%\newcommand{\CONT}{\mathtt{Ctx}}
+\newcommand{\TYPE}{\mathtt{type}}
+\newcommand{\issig}[2][]{\der^{#1} #2}
+\newcommand{\ismorph}[4][]{\der^{#1} #4:#2\arr#3}
+\newcommand{\iscont}[3][]{\der^{#1}_{#2}#3}
+\newcommand{\issubs}[5][]{\der^{#1}_{#2}#5:#3\arr #4}
+\newcommand{\istype}[3][]{\der^{#1}_{#2}#3:\TYPE}
+\newcommand{\oftype}[5][]{#3\der^{#1}_{#2}#4\;:\;#5}
+\newcommand{\lam}[2]{\lambda #1:#2.}
+\newcommand{\Boole}{\mathbb{B}}
+
+\newcommand{\PROOF}{\mathtt{proof}}
+\newcommand{\LF}{{\mathcal{LF}}}
+\newcommand{\KIND}{\mathtt{kind}}
+\newcommand{\isdsig}[1]{\der #1}
+\newcommand{\isdcont}[2]{\der_{#1}#2}
+\newcommand{\isdsubs}[4]{\der_{#1}#4:#2\arr #3}
+\newcommand{\isdkind}[4][]{#3\der^{#1}_{#2}#4:\KIND}
+\newcommand{\ofdkind}[5][]{#3\der^{#1}_{#2}#4\;:\;#5}
+\newcommand{\ofdtype}[5][]{#3\der^{#1}_{#2}#4\;:\;#5}
+\newcommand{\isdequal}[5][]{#3\der^{#1}_{#2}#4\;=\;#5}
+\renewcommand{\P}[2]{\Pi #1:#2.}
+
+\newcommand{\Type}{\mathtt{tp}}
+\newcommand{\Term}{\mathtt{tm}}
+\newcommand{\Fun}{\mathtt{\longrightarrow}}
+\newcommand{\App}[2]{#1@#2}
+\newcommand{\Lam}{\mathtt{lam}}
+
+\renewcommand{\pwr}{\op{POW}}
+
+\newcommand{\OSen}{\op{Form}}
+\newcommand{\FV}{\op{FV}}
+\newcommand{\BV}{\op{BV}}
+\newcommand{\Con}{\op{Con}}
+
+\newcommand{\sem}[1]{\llbracket #1\rrbracket}
+\newcommand{\semm}[2]{\sem{#1}^{#2}}
+\newcommand{\semcm}[3]{\sem{#1|#2}^{#3}}
+
+\newcommand{\Thm}{\op{Thm}}
+\newcommand{\Thy}{\op{Thy}}
+\newcommand{\ModC}{\op{ModC}}
+\newcommand{\galois}[1]{{#1}^\ast}
+\newcommand{\closure}[1]{{#1}^\bullet}
+\newcommand{\sM}{{\cal M}}
+
+\newcommand{\Clause}{\op{Clauses}}
+
+\newcommand{\defemph}[1]{{\bf #1}}
+
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}     % 2 may work better

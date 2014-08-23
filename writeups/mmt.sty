@@ -1,0 +1,177 @@
+%statements and other notation related to the grammar
+\newcommand{\bnfbracket}[1]{[#1]} %brackets in BNF
+%\newcommand{\terminal}[1]{#1} %terminal symbols
+\newcommand{\TG}{\mathcal{G}} %the symbol used for a signature graph
+\newcommand{\TGv}{\TG'} %a primed version to be safe against evolving notation
+\newcommand{\TGo}{\TG} %another variant used with foundations
+\newcommand{\Ypsilon}{\Upsilon} %context
+\newcommand{\tht}{\Sigma} %signature bodies
+\newcommand{\omg}{C} %terms
+\newcommand{\omt}{A} %terms used as type
+\newcommand{\omd}{B} %terms used as definiens
+
+\newcommand{\emptytheo}{\cdot} %emtpy theory body
+\newcommand{\emptygraph}{\cdot} %emtpy theory graph
+\providecommand{\emptycon}{\cdot} %empty context
+%\newcommand{\dot}{.} %a forbidden character
+\newcommand{\undef}{{\bot}} %the symbol used for undefined terms
+\newcommand{\hid}{{\top}} %the symbol used for hiding declared in the theory omdoc
+\newcommand{\ma}[2]{#2(#1)} %applying a morphism to a term
+\newcommand{\mab}[2]{\ma{#1}{#2}} %as \ma, but #1 is guaranteed to be bracketed
+\newcommand{\mmtident}[1]{\op{id}_{#1}} %the identity morphism
+
+\newcommand{\thdeclm}[3]{#1\,\stackrel{#2}{=}\,\left\{#3\right\}} %theory declaration with meta-theory
+\newcommand{\vwdeclm}[5]{#1\,:\,#2\arr#3\,\stackrel{#4}{=}\,\left\{#5\right\}} %view declaration with meta-morphism
+\newcommand{\vwdef}[4]{#1\,:\,#2\arr#3=\,#4} %view declaration with meta-morphism
+\newcommand{\impddm}[4]{#1\,:\,#2\,\stackrel{#3}{=}\,{\left\{#4\right\}}} %structure declaration with meta-morphism
+\newcommand{\thdecl}[2]{\thdeclm{#1}{}{#2}} %theory declaration without meta-theory
+\newcommand{\vwdecl}[4]{\vwdeclm{#1}{#2}{#3}{}{#4}} %view (theorem link) declaration without meta-morphism
+\newcommand{\impdd}[3]{\impddm{#1}{#2}{}{#3}} %structure declaration
+\newcommand{\dimpdd}[3]{\symdd{#1}{#2}{#3}} %defined structure
+% symbol declaration
+% \symdd{name}{type}{definition} yields name : type := definition
+% if type or definition are omitted, so is their delimiter
+\newcommand{\symdd}[3]{\def\@empty{}\def\@typ{#2}\def\@def{#3}#1\ifx\@typ\@empty\else\,:\,\@typ\fi\ifx\@def\@empty\else\,=\,\@def\fi}
+%\newcommand{\symdecl}[2]{#1\,:\,#2} %symbol declaration with omitted definiens
+\newcommand{\import}[1]{\mathtt{import}\;#1} %unnamed import declaration
+
+\newcommand{\maps}[2]{#1:=#2} %an instantiation
+\newcommand{\includes}[2]{#1\rewrites #2} %an inclusion, currently not used
+\newcommand{\emptyimport}[1]{\cdot} %empty substitution defaulting to import
+\newcommand{\emptyview}{\cdot} %empty substitution defaulting to \hid
+
+\newcommand{\ifbot}[2]{#1?#2} %if #1=\bot, then #2 else #1
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%names
+\newcommand{\localpathsep}{.}
+\newcommand{\globalpathsep}{..}
+\newcommand{\mpath}[2]{#1\globalpathsep\ompath{#2}}
+\newcommand{\spath}[2]{#1\globalpathsep\ompath{#2}}
+\newcommand{\triple}[3]{\spath{\mpath{#1}{#2}}{#3}}
+\newcommand{\mmt@assoc}[2]{\let\@tmpop=\relax\@for\@I:=#2\do{\@tmpop\@I\let\@tmpop=#1}}% flexary arguments
+\newcommand{\ompath}[1]{\mmt@assoc{\localpathsep}{#1}} %lists used in theory paths and flat names
+\newcommand{\mmt@cnassoc}[2]{\let\@tmpop=\relax\@for\@I:=#2\do{\@tmpop\cn{\@I}\let\@tmpop=#1}}% flexary arguments
+\newcommand{\cnpath}[1]{\mmt@cnassoc{\localpathsep}{#1}} %lists used in theory paths and flat names
+\newcommand{\lapp}[2]{#1\localpathsep #2} %appending to a list
+\newcommand{\cn}[1]{\mathtt{#1}} %concrete names (i.e., those not given by meta-variables)
+
+\newcommand{\uq}[1]{#1} %unqualified names
+\newcommand{\qq}[1]{\vec{#1}} %qualified names
+%shortcuts for qualified (\q*) and unqualified names (\u*)
+%s: symbol, c: constant, i,h: structure, R,S,T: signature, m: view, l: link
+\newcommand{\qs}{\qq{n}}
+\newcommand{\us}{\uq{n}}
+\newcommand{\qc}{\qq{c}}
+\newcommand{\uc}{\uq{c}}
+\newcommand{\qi}{\qq{s}}
+\newcommand{\ui}{\uq{s}}
+\newcommand{\qh}{\qq{r}}
+\newcommand{\uh}{\uq{r}}
+\newcommand{\qT}{T}
+\newcommand{\uT}{\qT}
+\newcommand{\qS}{S}
+\newcommand{\uS}{\qS}
+\newcommand{\qR}{R}
+\newcommand{\uR}{\qR}
+\newcommand{\qm}{v}
+\newcommand{\um}{\qm}
+\newcommand{\ql}{m}
+
+\newcommand{\resolve}[2]{\op{resolve}(#1,#2)} %unqualified names
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%lookup functions
+\newcommand{\thdom}[1]{\op{Sig}(#1)}
+\newcommand{\tlkp}[2]{#1(#2)}
+\newcommand{\slkp}[3]{#1^{#2}(#3)}
+
+\newcommand{\judgmentsymbolelab}{\ggg}
+\newcommand{\elabsym}[5]{#1\judgmentsymbolelab_{#2}\symdd{#3}{#4}{#5}}
+\newcommand{\elabass}[4]{#1\judgmentsymbolelab_{#2}\maps{#3}{#4}}
+\newcommand{\elablink}[5]{#1\judgmentsymbolelab_{#4} #2:#3:= #5}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%judgments
+\newcommand{\judgmentsymbol}{\vdash} %the symbols to distinguish judgments
+\newcommand{\judgmentsymbolext}{\vartriangleright}
+\newcommand{\library}[1]{\judgmentsymbol #1} %valid library
+\newcommand{\tsta}[3]{{#1}\judgmentsymbolext #3} %valid module
+\newcommand{\ssta}[3]{{#1}\judgmentsymbolext #3} %valid symbol
+\newcommand{\sins}[3]{{#1}\judgmentsymbolext #3} %valid instantiation
+\newcommand{\oterm}[3]{#1\judgmentsymbol_{#2}#3} %valid term
+\newcommand{\otermtype}[4]{#1\judgmentsymbol_{#2}#3:#4} %valid term of some type
+\newcommand{\otermequal}[4]{#1\judgmentsymbol_{#2}#3\equiv #4} %equality of terms
+\newcommand{\omorphism}[4]{{#1}\judgmentsymbol_{#4} #2:#3} %valid morphism
+\newcommand{\omorphequal}[3]{#1\judgmentsymbol #2\equiv #3} %equality of morphisms
+\newcommand{\newname}[3]{\op{noClash}(#1,#2,#3)} %new symbol name
+\newcommand{\newnamem}[2]{\op{noClash}(#1,#2)} %new module name
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% names of inference rules
+
+\newcommand{\mmtDoc}{\TG}
+\newcommand{\mmtTth}{D_{\uT}}
+\newcommand{\mmtViw}{D_{\um}}
+\newcommand{\mmtCon}{D_{\uc}}
+\newcommand{\mmtStr}{D_{\ui}}
+\newcommand{\mmtMod}{D_{Mod}}
+\newcommand{\mmtSym}{D_{Sym}}
+\newcommand{\mmtAss}{D_{Ass}}
+
+%% note that \algname and \TGSys have no effect in the rule names below; they are remains from earlier versions
+\newcommand{\algname}[2]{{\it{#1}}#2}
+\newcommand{\TGsys}{}
+
+\newcommand{\TGemptygraph}{\algname\TGsys{\mmtDoc_\es}}
+\newcommand{\TGthy}{\algname\TGsys{Sig}}
+\newcommand{\TGview}{\algname\TGsys{View}}
+\newcommand{\TGemptytheory}{\algname\TGsys{Sig_\es}}
+\newcommand{\TGstatement}{\algname\TGsys{Sym}}
+\newcommand{\TGemptyview}{\algname\TGsys{View_\es}}
+\newcommand{\TGviewinstantiation}{\algname\TGsys{View_{Ass}}}
+\newcommand{\TGemptyviewmapall}{\algname\TGsys{View_\mu}}
+\newcommand{\TGemptyimport}{\algname\TGsys{Str_\es}}
+\newcommand{\TGimportinstantiation}{\algname\TGsys{Str_{Ass}}}
+\newcommand{\TGemptyimportmapall}{\algname\TGsys{Str_\mu}}
+\newcommand{\TGsymbol}{\algname\TGsys{Con}}
+\newcommand{\TGinstsymb}{\algname\TGsys{ConAss}}
+\newcommand{\TGinstimp}{\algname\TGsys{StrAss}}
+
+\newcommand{\TOsys}{\cal{T}}
+\newcommand{\TEtype}{\algname\TOsys_{:}}
+\newcommand{\TEequal}{\algname\TOsys_{\equiv}}
+\newcommand{\TMsys}{{\cal{M}}}
+\newcommand{\TMid}{\algname\TMsys_{id}}
+\newcommand{\TMmor}{\algname\TMsys_{m}}
+%\newcommand{\TMimp}{\algname\TMsys{Imp}}
+\newcommand{\TMcomp}{\algname\TMsys_{\bullet}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% operations
+\newcommand{\flatten}[3]{#3^{#1}(#2)}
+\newcommand{\flattenx}[2]{\mtext{translate}#1 \mtext{by} #2}
+\newcommand{\mergei}[2]{#1\cup #2}
+\newcommand{\elimi}[1]{\widetilde{#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% miscallenous other commands that should be categorized better
+\newcommand{\om}[1]{\fbox{\ensuremath{#1}}}
+\newcommand{\deq}{\colon=}
+\providecommand{\dom}[1]{\mathop{dom}(#1)}
+\newcommand{\llquote}[1]{\ensuremath{\langle\kern-.25em\langle\hbox{\sl{#1}}\rangle\kern-.25em\rangle}}
+\newcommand{\NN}{{\mathbb{N}}}
+\newcommand{\functors}[2]{S\Rightarrow T} %functors
+
+%xml encoding
+\newcommand{\enc}[1]{E(#1)}
+\newcommand{\omdocoms}[1]{\op{OMDoc}(\texttt{#1})}
+
+% for kwarc.bib
+%\def\LNAI{LNAI}
+%\def\LNCS{LNCS}
+%\def\PROC{Proceedings }
+\newcommand{\USA}{USA}
+\newcommand{\cG}{{\cal G}}
+

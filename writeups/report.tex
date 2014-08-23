@@ -1,0 +1,714 @@
+\documentclass{article}
+\usepackage{graphicx,url,wrapfig,array}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{tikz}
+\usetikzlibrary{shapes}
+\usetikzlibrary{arrows}
+\usepackage[T1]{fontenc}
+\usepackage{wrapfig}
+\usepackage{mathtools}
+\usepackage{multicol}
+\usepackage{stmaryrd}
+\usepackage{listing}
+\usepackage[nobook]{theorems}
+\usepackage{ded}
+\usepackage{basics}
+\usepackage{twelf-math}
+\usepackage{macros}
+\usepackage[bookmarksnumbered]{hyperref}
+\newcommand{\Ic}{\mathcal{I}}
+\newcommand{\isterm}[3]{#2\,\vdash_{#1}\,#3\,\in\,\mathit{wft}(#1)}
+\newcommand{\isform}[3]{#2\,\vdash_{#1}\,#3\,\in\,\mathit{wff}(#1)}
+
+\title{An Extension of FOL by a Description Operator}
+\author{Timo Luecke}
+
+\begin{document}
+  \thispagestyle{empty}
+
+  \begin{flushleft}
+    \textbf{\huge A Description Operator for First-Order-Logic}
+  \end{flushleft}
+  \vspace*{6mm}
+  \begin{flushleft}
+    \textbf{\large Timo L\"ucke}\\[2ex]
+  \end{flushleft}
+  \vspace*{1mm}
+  \begin{flushleft}
+    \textit{Mathematics \\
+      Jacobs University Bremen \\
+      Campus Ring 1 \\
+      28759 Bremen \\
+      Germany}
+  \end{flushleft}
+  \vspace*{6mm}
+  \begin{tabbing}
+    \textit{Supervisor:} \= \kill
+    \textit{Type:} \> \ \ \ \ \textit{Bachelor's Thesis}\\
+    \textit{Date:} \> \ \ \ \ \textit{\today} \\
+    \textit{Advisors:} \> \ \ \ \ \textit{Prof.\ Dr.\ Michael Kohlhase, Dr.\ Florian Rabe}\\
+    \textit{Second Reader:} \> \ \ \ \ \textit{Prof.\ Dr.\ Stefan Maubach}\\
+  \end{tabbing}
+  \vspace*{2mm}
+  ~\hrule
+
+\clearpage
+
+
+\begin{abstract}
+First-order-logic (FOL) is immensely important in wide areas of mathematics and computer science. There is a wide array of extensions by minor features which make FOL more expressive.
+
+One such feature is a description operator which we look at in more detail in this thesis. It is surprising that there is no logic which formally extends FOL with a description operator. is essential for formalizing most areas of Mathematics. In this thesis we introduce a new logic FOL\textsuperscript{$\delta$}, which provides a description operator. We then go on to prove soundenss and completeness and give a semantics-preserving translation into FOL
+
+We utilize the Edinburgh Logical Framework (LF) to define our new logic. One particular difficulty of the description operator is that it is a partial operator, as it is only defined if the predicate is uniquely satisfiable. We capture this partiality by making proofs part of terms. This allows terms to carry witnesses of proofs of their definedness.
+\end{abstract}
+
+\tableofcontents
+
+
+\section{Introduction and Related Work}
+
+For a lot of applications of logic both in mathematics and computer science first-order logic (FOL) is the logic of choice, as it is, in some sense, the most expressive logic for which there is a complete calculus.
+However, this comes at the expense of not being able to express certain mathematical concepts (like partial functions) elegantly. 
+
+There are possible ways to improve this situation. One possibility is to move to higher-order logics. However, by doing this we lose a number of desired theoretical properties (most importantly the existence of a complete calculus with respect to standard set theoretical semantics) and the fairly large amount of computer support that has been developed for FOL. Therefore, a widely studied approach is to adapt FOL.
+
+Many extensions have been extremely well-studied,
+but -somewhat surprisingly- the description operator, which is prevalent in informal mathematics, has received relatively little attention:
+Phrases like ``let $x$ be the unique element such that $P(x)$ holds'' are very widespread in mathematical textbooks and papers alike, but cannot be formalized directly in pure FOL.
+
+In order to formalize such phrases we  extend FOL with a definite description operator $\delta$, an operator that for any provable sentence of the form $\exists! x.P (x)$ allows us to obtain the unique witness $x$.
+
+We present a new approach to the formal definition of this operator. Additionally we provide a semantics-preserving translation procedure of our new logic into FOL. Translations between different first-order logics have been given in \cite{casl} and \cite{dfoltrans}
+
+\paragraph{Related Work}
+There are many approaches to this, for example CASL\cite{casl} in the field of algebraic specification which extends FOL by a number of orthogonal features (sorts, subsorts and partial functions among others) or TPTP\cite{tptp} which is a concrete syntax mostly used in automated reasoning and includes sorts, interpreted arithmetics and shallow polymorphisms. 
+Another possible addition to FOL is dependent typing\cite{dfol} (the type of later arguments expected by a function may be determined by its earlier arguments).
+
+As noted above, some extensions also include partial functions. Since the description operator is partial, it is worth looking at the different approaches to deal with partiality.
+In most cases they accept well-formed undefined terms and introduce either a special constant $\perp$ (as in \cite{lpf}) for undefined or a predicate $def$ (as in \cite{casl}), they deal with undefinedness at the semantic level. We go a different route and avoid undefined terms by making them ill-formed. This has the drawback that it usually leads to definedness of terms being undecidable. To overcome this issue we can (as done in this thesis) require terms to carry a proof of their definedness  (using reasoning support to help with the high number of proof obligations put on the author). This leads to the problem of representing proofs inside terms.\footnote{citations for partial fun, HOL}
+
+A different approach is widespread in higher-order-logic (HOL): Church's original paper \cite{churchtypes} already included a choice operator (of which the description operator is a simple special case). Its approach is somewhat similar to the $\perp$ mentioned above (but without a special constant being introduced): the axioms guarantee that every type is non-empty, and the choice operator (of which the description operator is a special case) is defined as an operator from formulas with one free variable to terms. The disadvantage of this approach is \footnote{ non-empty axiom, no explicit value?, counterintuitive?}. 
+
+\paragraph{Methods} We will use the Edinburgh Logical Framework (LF) \cite{lf}
+to represent our logic. This was already done for the extension of FOL by dependent types in \cite{dfol}. It allows an elegant and natural formalization of the description operator and its semantics by incorporating proofs in terms, resulting in a logic we call FOL\textsuperscript{$\delta$}. More specifically, our operator takes two arguments, a formula $A=\exists!x.F(x)$ and a proof $P$ of $A$, and returns the unique witness.
+
+\paragraph{Outline}In Section 2 we first present standard FOL and then give an introduction into LF, using FOL as an example. We then discuss the extensions necessary to incorporate the description operator in Section 3. We give a formalization of basic concepts of set theory as a case study in Section 4. We prove soundness and completeness in Sect. 3 and 5 respectively. Our completeness result is derived from a semantics-preserving translation, which we also give in Section 5, before giving a brief conclusion in Section 6.
+
+
+
+All LF-encodings are available at \url{https://svn.kwarc.info/repos/supervision/gr/2014/luecke_timo/project/}.\footnote{so far they aren't}
+
+
+\section{Preliminaries}
+
+\subsection{First-Order-Logic}
+In this section, we  introduce first-order logic in order to give an overview of the definitions and notations we will use. These definitions are taken from \cite{FOLsound}
+and expanded where necessary.
+
+\begin{definition}[Signatures]\label{def:folsig}
+A FOL-\emph{signature} is a triple $(\Sigma_f,\Sigma_p,\arit)$ where $\Sigma_f$ and $\Sigma_p$ are disjoint sets of function and predicate symbols, respectively, and $\arit:\Sigma_f\cup\Sigma_p\arr\N$ assigns arities to symbols. We will treat constants and boolean variables as the special case of arity $0$.
+\end{definition}
+
+\begin{definition}[Expressions]\label{def:folexpr}
+A FOL-\emph{context} is a list of variables.
+For a signature $\Sigma$ and a context $\Gamma$, the \emph{terms} over $\Sigma$ and $\Gamma$ are formed from the variables in $\Gamma$ and the application of function symbols $f\in\Sigma_f$ to terms.
+The \emph{formulas} over $\Sigma$ and $\Gamma$ are formed by the application of predicate symbols $p\in\Sigma_p$ to terms as well as through application of connectives to formulas. In addition we define $\exists! x.P(x) := \exists z.P(x)\wedge (\forall y. (P(y)\impl y\doteq x))$.
+
+
+\begin{tabular}{ p{1cm}p{1cm}p{8cm}}
+$term$ & ::= & $x$ \\
+		&	&  |$f(\underbrace{term, ... term}_{ar(f)})$  | \\
+$form$ & ::= &  $\neg form$\ |\ $form\wedge form$\ |\ $form\vee form$\\
+		&  & |$form\impl form$\ |\ $term\doteq term$ \\
+       &  & |$true$\ |\ $false$ \\
+        &   &| $\forall x.form(x)$\ |\ $\exists x.form(x)$\\ 
+      
+		&  & $p(\underbrace{term, term,... term}_{ar(p)}) |$\\ 
+
+\end{tabular}
+
+Formulas in the empty context are called $\Sigma$-\emph{sentences}, and we write $\Sen(\Sigma)$ for the set of sentences.
+\end{definition}
+
+\begin{definition}[Theories]\label{def:thy}
+A FOL-\emph{theory} is a pair $(\Sigma,\Theta)$ for a signature $\Sigma$ and a set $\Theta \subseteq \Sen(\Sigma)$ of \emph{axioms}.
+\end{definition}
+
+\begin{definition}[Signature Morphisms]
+Given two signatures $\Sigma=(\Sigma_f,\Sigma_p,\arit)$ and $\Sigma'=(\Sigma'_f,\Sigma'_p,\arit')$, a FOL-\emph{signature morphism} $\sigma:\Sigma\arr\Sigma'$ is an arity-preserving mapping from $\Sigma_f$ to $\Sigma'_f$ and from $\Sigma_p$ to $\Sigma'_p$.
+
+The \emph{homomorphic extension} of $\sigma$ -- which we also denote by $\sigma$ -- is the mapping from terms and formulas over $\Sigma$ to terms and formulas over $\Sigma'$ that replaces every symbol $s\in\Sigma_f\cup\Sigma_p$ with $\sigma(s)$. The \emph{sentence translation}\linebreak $\Sen(\sigma):\Sen(\Sigma)\arr\Sen(\Sigma')$ arises as the special case of applying $\sigma$ to sentences.
+\end{definition}
+
+\begin{example}[Monoids and Groups]\label{ex:mongr}
+We will use the theories $\monoid = (\Monsig,\linebreak \Monax)$ and $\group=(\Grsig,\Grax)$ of monoids and groups as running examples. $\Monsig_f$ is the set $\{\circ,e\}$ where $\circ$ is binary (written infix) and $e$ is nullary, and $\Monsig_p$ is empty. $\Monax$ consists of the axioms for
+\begin{itemize}
+\item associativity: $\forall x\;\forall y\;\forall z\;x\circ (y\circ z) \doteq (x\circ y)\circ z$,
+\item left-neutrality: $\forall x\;e\circ x \doteq x$,
+\item right-neutrality: $\forall x\;x\circ e \doteq x$.
+\end{itemize}
+The theory $\group$ extends $\monoid$, i.e., $\Grsig$ adds a unary function symbol $\inv$ (written as superscript $^{-1}$) to $\Monsig$, and $\Grax$ adds axioms to $\Monax$ for the following:
+\begin{itemize}
+\item left-inverseness: $\forall x\;x^{-1}\circ x \doteq e$, 
+\item right-inverseness: $\forall x\;x\circ x^{-1} \doteq e$.
+\end{itemize}
+
+The inclusion mapping $\mongr$ is a signature morphism from $\Monsig$ to $\Grsig$. 
+%It is also a theory morphism from $\monoid$ to $\group$.
+\end{example}
+
+There are various ways to define the \emph{proof theory} of FOL. Here we choose the natural deduction calculus (\ND) with introduction and elimination rules. 
+
+\smallnd
+\begin{fignd}{fol:nd}{Proof Rules (derived rules at the bottom)}
+\ianc{}
+     {\sgcons{}{\true}}
+     {}
+\tb\tb
+\ibnc{\sgcons{}{\false}}
+     {\isform{\Sigma}{\Gamma}{F}}
+     {\sgcons{}{F}}
+     {}
+\\
+\ianc{\sgcons[F]{}{\false}}
+     {\sgcons{}{\neg\,F}}
+     {}
+\tb\tb
+\ibnc{\sgcons{}{\neg\,F}}
+     {\sgcons{}{F}}
+     {\sgcons{}{\false}}
+     {}
+\\
+\ibnc{\sgcons{}{F}}
+     {\sgcons{}{G}}
+     {\sgcons{}{F\,\wedge\,G}}
+     {}
+\tb\tb
+\ianc{\sgcons{}{F\,\wedge\,G}}
+     {\sgcons{}{F}}
+     {}
+\tb\tb
+\ianc{\sgcons{}{F\,\wedge\,G}}
+     {\sgcons{}{G}}
+     {}
+\\
+\ianc{\sgcons[F]{}{G}}
+     {\sgcons{}{F\,\impl\,G}}
+     {}
+\tb\tb
+\ibnc{\sgcons{}{F\,\impl\,G}}
+     {\sgcons{}{F}}
+     {\sgcons{}{G}}
+     {}
+\\
+\ibnc{\sgcons{}{F}}
+     {\isform{\Sigma}{\Gamma}{G}}
+     {\sgcons{}{F\,\vee\,G}}
+     {}
+\tb\tb
+\ibnc{\sgcons{}{G}}
+     {\isform{\Sigma}{\Gamma}{F}}
+     {\sgcons{}{F\,\vee\,G}}
+     {}
+\tb\tb
+\icnc{\sgcons{}{F\,\vee\,G}}
+     {\sgcons[F]{}{H}}
+     {\sgcons[G]{}{H}}
+     {\sgcons{}{H}}
+     {}
+\\
+\ibnc{\sgcons{}{F}}
+     {x\;fresh}
+     {\sgcons{}{\forall\,x\,F}}
+     {}
+\tb\tb
+\ibnc{\sgcons{}{\forall\,x\,F}}
+     {\isterm{\Sigma}{\Gamma}{t}}
+     {\sgcons{}{F\,[x/t]}}
+     {}
+\\
+\ianc{\sgcons{}{F\,[x/t]}}
+     {\sgcons{}{\exists\,x\,F}}
+     {}
+\tb\tb
+\icnc{\sgcons{}{\exists\,x\,F}}
+     {x\;fresh}
+     {\sgcons[F]{}{H}}
+     {\sgcons{}{H}}
+     {}
+\\
+\ianc{F\,\in\,\Theta}
+     {\sgcons{}{F}}
+     {}
+\tb\tb
+\ianc{\isform{\Sigma}{\Gamma}{F}}
+     {\sgcons{}{F\,\vee\,\neg\,F}}
+     {}
+\\
+\ianc{}
+     {\sgcons{}{t\,\doteq\,t}}
+     {}
+\tb\tb
+\ianc{\sgcons{}{\eq{s}{t}}}
+     {\sgcons{}{\eq{t}{s}}}
+     {}
+\tb\tb
+\ibnc{\sgcons{}{\eq{r}{s}}}
+     {\sgcons{}{\eq{s}{t}}}
+     {\sgcons{}{\eq{r}{t}}}
+     {}
+\\
+\icnc{\sgcons{}{\eq{s_i}{t_i}}}
+     {f\in\Sigma_{f}}
+     {\arit(f)=n}
+     {\sgcons{}{\eq{f(s_1,\ldots,s_n)}{f(t_1,\ldots,t_n)}}}
+ 		 {}
+\tb\tb
+\icnc{\sgcons{}{\eq{s_i}{t_i}}}
+		 {p\in\Sigma_p}
+     {\arit(p)=n}
+     {\Theta, p(s_1,\ldots,s_n)\,\vdash_\Sigma p(t_1,\ldots,t_n)}
+ 		 {}
+\\
+\hline
+\ibnc{\sgcons{}{F\,[x/t]}}
+	 {\sgcons{}{F\,x\impl F\ y\eq{y}{x}}}
+     {\sgcons{}{\exists!\,x\,F}}
+     {}
+\tb\tb
+\ianc{\sgcons{}{\exists!\ x\ F}}
+     {\sgcons{}{\exists\ x\ F\ \wedge (F\ s\ \wedge\ F\ t\ \impl \eq{s}{t})}}
+    {}
+
+\end{fignd}
+
+\begin{definition}[Proof Theoretical Theorems]
+Given a theory $(\Sigma,\Theta)$, we say that $F\in\Sen(\Sigma)$ is a \emph{proof theoretical theorem} of $(\Sigma,\Theta)$ if the judgment $\iscons{\Sigma}{F_1,\ldots,F_n}{F}$ is derivable for some $\{F_1,\ldots,F_n\}\sq\Theta$ using the calculus shown in Fig.~\ref{fignd}. We write this as $\iscons{\Sigma}{\Theta}{F}$.
+\end{definition}
+
+\begin{lemma} 
+The 2 rules at the bottom of \ref{fol:nd} are derivable from the others.
+\end{lemma}
+
+\begin{proof}
+Straightforward
+\end{proof}
+
+\begin{definition}[Proof Theoretical Theory Morphisms]
+A signature morphism from $\Sigma$ to $\Sigma'$ is a \emph{proof theoretical theory morphism} from $(\Sigma,\Theta)$ to $(\Sigma',\Theta')$, written  $\pmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$, if $\Sen(\sigma)$ maps the axioms of $(\Sigma,\Theta)$ to proof theoretical theorems of $(\Sigma',\Theta')$, i.e., for all $F\in\Theta$,
+$\iscons{\Sigma'}{\Theta'}{\Sen({\sigma})(F)}$ holds.
+\end{definition}
+
+\begin{lemma}[Proof Translation]
+Assume a proof theoretical theory morphism\linebreak
+$\sigma:(\Sigma,\Theta)\arr(\Sigma',\Theta')$. If $F$ is a proof theoretical theorem of $(\Sigma,\Theta)$, then $\Sen(\sigma)(F)$ is a proof theoretical theorem of $(\Sigma',\Theta')$. In other words, provability is preserved along proof theoretical theory morphisms.
+\end{lemma}
+
+We now go on to develop the \emph{model theory} of FOL.
+
+\begin{definition}[Models of a FOL-Signature]\label{def:model}
+A FOL-\emph{model of a signature} $\Sigma$ is a pair $(\U,\I)$ where $\U$ is a non-empty set (called the \emph{universe}) and $\I$ is a function of $\Sigma$-symbols (called the interpretation) such that
+\begin{itemize}
+\item $f^\I\in\U^{(\U^n)}$ for $f\in \Sigma_f$ with $\arit(f)=n$,
+\item $p^\I\subseteq \U^n$ for $p\in \Sigma_p$ with $\arit(p) = n$.
+\end{itemize}
+We write $\Mod(\Sigma)$ for the class of $\Sigma$-models.
+\end{definition}
+
+\begin{definition}[Model Theoretical Semantics]\label{def:semantics}
+Assume a signature $\Sigma$, a context $\Gamma$, and a $\Sigma$-model $\M=(\U,\I)$. An \emph{assignment} is a mapping from $\Gamma$ to $\U$. For an assignment $\alpha$, the \emph{interpretation} $I^\alpha(t)\in\U$ of terms $t$ and $I^\alpha(F)\in\{0,1\}$ of formulas $F$ over $\Sigma$ and $\Gamma$ are defined in the usual way by induction on the syntax:
+\begin{itemize}
+\item $I^\alpha(x)\ =\alpha(x)\ $ for $x\in\Gamma$
+\item $I^\alpha(f(t_1\dots t_n))= f^I(I^\alpha(t_1)\dots I^\alpha(t_n))$
+\item $I^\alpha(p(t_1\dots t_n))=1$ iff $(I^\alpha(t_1)\dots I^\alpha(t_n))\in p^I$
+\item $I^\alpha(F\wedge G)= min(I^\alpha(F),I^\alpha(G))$
+\item $I^\alpha(F\vee G)= max(I^\alpha(F),I^\alpha(G))$
+\item $I^\alpha(\neg F)=1$ iff $I^\alpha(F)=0$
+\item $I^\alpha(F\impl G)=1$ iff $I^\alpha(G)=1$ or $I^\alpha(\neg F)=1$
+\item $I^\alpha(s\doteq t)=1$ iff $I^\alpha(s)=I^\alpha(t)$
+\item $I^\alpha(\forall x\ F)=1$ iff forall $u\in U\ \ I^{\alpha,[u/x]}(F)=1$
+\item $I^\alpha(\exists x\ F)=1$ iff exists $u\in U\ \ I^{\alpha,[u/x]}(F)=1$
+\end{itemize}
+
+Given a sentence $F$, we write $\moda{\M}{\Sigma}{F}$ if $\semm{F}{\M}=1$.
+
+Given a theory $(\Sigma,\Theta)$, we write the class of $(\Sigma,\Theta)$-models as
+\[\Mod(\Sigma,\Theta) = \{M\in \Mod(\Sigma)\,|\,\moda{M}{\Sigma}{F} \textrm{ for all } F\in\Theta\}.\]
+\end{definition}
+
+Since we are especially interested in unique existence, but it is not a primary object in the logic, we provide its interpretation here.
+\begin{lemma}
+\item $I^\alpha(\exists! x\ F)=1$ iff there exists a unique $u\in U\ \ I^{\alpha,[u/x]}(F)=1$\\
+\end{lemma}
+
+\begin{proof}
+Straightforward \end{proof}
+
+\begin{definition}[Model Theoretical Theorems]
+Given a theory $(\Sigma,\Theta)$, we say that $F\in\Sen(\Sigma)$ is a \emph{model theoretical theorem} of $(\Sigma,\Theta)$ if the following holds for all $\Sigma$-models $\M$: If $\moda{\M}{\Sigma}{A}$ for all $A\in\Theta$, then also $\moda{\M}{\Sigma}{F}$. We write this as $\moda{\Theta}{\Sigma}{F}$.
+\end{definition}
+
+\begin{definition}[Model Reduction]
+Given a signature morphism $\sigma:\Sigma\arr\Sigma'$ and a $\Sigma'$-model $\M'=(\U,\I')$, we obtain a $\Sigma$-model $(\U,\I)$, called the \emph{model reduct} of $M'$ along $\sigma$, by putting $s^{\I}=\sigma(s)^{\I'}$ for all symbols of $\Sigma$. We write $\Mod(\sigma):\Mod(\Sigma')\arr\Mod(\Sigma)$ for the induced model reduction.
+\end{definition}
+
+\begin{definition}[Model Theoretical Theory Morphisms]
+Given two theories $(\Sigma,\Theta)$ and $(\Sigma',\Theta')$, a \emph{model theoretical theory morphism} from $(\Sigma,\Theta)$ to $(\Sigma',\Theta')$, written  $\mmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$, is a signature morphism from $\Sigma$ to $\Sigma'$ such that $\Mod(\sigma)$ reduces models of $(\Sigma',\Theta')$ to models of $(\Sigma,\Theta)$, i.e, for all $M'\in \Mod(\Sigma',\Theta')$, we have $\Mod(\sigma)(M')\in\Mod(\Sigma,\Theta)$.
+\end{definition}
+
+
+\begin{example}[Continued]\label{ex:monmod}
+The integers form a model $Int=(\Z,+,0,-)$ for the theory of groups (where we use a tuple notation to give the universe and the interpretations of $\circ$, $e$, and $\inv$, respectively). The model reduction\linebreak
+ $\Mod(\mongr)(Int)=(\Z,+,0)$ along $\mongr$ yields the integers seen as a model of the theory of monoids.
+\end{example}
+
+We have given both proof theoretical and model theoretical definitions of \emph{theorem} and \emph{theory morphism}. In general, these must be distinguished to avoid a bias towards proof or model theory. However, they coincide if a logic is sound and complete:
+
+\begin{theorem}[Soundness and Completeness]
+Assume a FOL-theory $(\Sigma,\Theta)$ and a $\Sigma$-sentence $F$. Then $\iscons{\Sigma}{\Theta}{F}$ iff $\moda{\Theta}{\Sigma}{F}$. Therefore, for a FOL-signature morphism $\sigma:\Sigma\arr\Sigma'$, we have $\pmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$ iff $\mmorph{\sigma}{(\Sigma,\Theta)}{(\Sigma',\Theta')}$.
+\end{theorem}
+
+
+
+\subsection{The Edinburgh Logical Framework}
+In this section we introduce the Edinburgh Logical Framework\cite{lf}. We again follow \cite{FOLsound} in large parts, but use a different running example.
+
+LF (\cite{lf}) is a dependent type theory that extends simple type theory with dependent function types. The main use of LF is as a \emph{logical framework} in which deductive systems are represented.
+
+We develop the syntax and semantics of LF along with an example representation of the first-order logic defined above. 
+Typically, \emph{kinded type families} are declared to represent the syntactic classes of the encoded logic. For FOL, we declare
+\begin{twelfsig}
+$form$ \tcolon $\type$ \\
+$term$ 	\tcolon $\type$\\
+$\ded$ \tcolon $form\arr\type$ \\
+$contra$ \tcolon $type$ = \{a\} ded\ a \\
+\end{twelfsig}
+
+Here $\type$ is the LF-kind of types, and $form$ is an LF-type whose LF-terms represent the FOL-formulas. $\ded$ : $form\arr\type$ is the kind of types that are proofs of formulas: for any formula $A\ ded\ A$ is the type of proofs of $A$.
+
+\emph{Typed constants} are declared to represent the constructors of the expressions of the represented system. For the syntax of FOL, we declare
+\begin{twelfsig}
+%$\sarr$  \tcolon $\tp\arr\tp\arr\tp$ & \lfkw{infix} right $0$ $\sarr$\\
+%$\sapp$  \tcolon $\tm\;(A\sarr B)\arr \tm\;A \arr\tm\; B$ & \lfkw{infix} left $1000$ $\sapp$\\
+%$\slam$  \tcolon $(\tm\;A\arr\tm\;B)\arr \tm\;(A\sarr B)$\\
+$eq$ \tcolon $ term\arr term\arr form$ & $1 = 2$ prec 25\\
+$true$ \tcolon $ form$\\
+$false$ \tcolon $form$\\
+$and$ \tcolon $form \arr form \arr form$ & $1 \wedge 2$ prec 15\\
+$or$ \tcolon $form \arr form \arr form$ & $1 \vee 2$ prec 15\\
+$impl$ \tcolon $form \arr form \arr form$ & $1 \Rightarrow$ prec 10\\
+%$equiv$ \tcolon $form \arr form \arr form$ & $1 \Leftrightarrow 2$ prec 10  \\
+$neg$ \tcolon $form \arr form$ & $\neg 1$ prec 20\\
+$forall$ \tcolon $ (term\arr form)\arr form$ & $\forall 1$ prec 30\\
+$exists$ \tcolon $ (term\arr form)\arr form$ & $\exists 1$ prec 30\\
+$existsU$ \tcolon $ (term\arr form)\arr form$ & $\exists! 1$ prec 30\\
+%add derivation\ \ \ \ $
+
+\end{twelfsig}
+This is simply the syntax given in the Sect. 2.1 expressed in LF. 
+Note that $existsU$ can be defined to be an abbreviation. The second part of each definition gives the notation that we will use and the precedence of the argument for bracket elision.
+
+
+
+%We will always use Twelf notation for the LF primitives of binding and application: The type $\Pi_{x:A}B(x)$ of dependent functions taking $x:A$ to an element of $B(x)$ is written $\tPi[A]{x}B\;x$, and the function term $\lambda_{x:A}t(x)$ taking $x:A$ to $t(x)$ is written $\tlam[A]{x}t\;x$. (Therefore, $\lambda$ is available for user-declared symbols.) In particular, in the above example, the STT-term $\lambda_{x:A}t$ is represented as the LF-term $\slam \tlam[A]{x} t$. Finally, we write $A\arr B$ instead of $\tPi[A]{x}B$ if $x$ does not occur in $B$, and we will also omit the types of bound variables if they can be inferred.
+
+LF employs the Curry-Howard correspondence to represent proofs-as-terms \cite{curryhoward} and extends it to the  \emph{judgments-as-types} methodology \cite{martinlof}. 
+To exemplify this we add to the syntax of FOL the proof rules of the natural deduction calculus for $\wedge$ and $\forall$, the full encoding is availabe at \url{https://svn.kwarc.info/repos/supervision/gr/2014/luecke_timo/project/FOL}%link:
+\begin{twelfsig}
+$trueI$ \tcolon $ded\ true$ \\
+$andI$ \tcolon $\{A,B\}\  ded\ A\arr ded\ B \arr ded\ A\wedge B$ \\
+$andEl$ \tcolon $\{A,B\}\ ded\ A \wedge B \arr ded\ A$\\
+$andEr$ \tcolon $\{A,B\}\ ded\ A \wedge B \arr ded\ B$\\
+$forallI$ \tcolon $\{A\} (\{x: term\}\ ded\ (A\ x)) \arr ded\ (\forall [x]\ A\ x)$\\        
+$forallE$ \tcolon  $\{A,t: term\} ded\ (\forall [x: term]\ A\ x) \arr ded\ (A\ t)$\\ 
+ %add rest
+\end{twelfsig}
+
+Consequently, all inference rules are represented as appropriately typed constants, and inference rules as operators on the family of types of proofs.
+
+Note that these operators like \emph{andI} really take $4$ arguments. This uses the main feature of dependent type theory: The first two arguments $A$ and $B$ may occur in the types of the later arguments and in the return type.
+Implementations, like the MMT implementation \cite{mmt} that we use, treat $A$ and $B$ as \emph{implicit arguments} and infers their values from the types of the other arguments. Thus, we can write (for proofs $P$ of $A$ and $Q$ of $B$) $andI\ P\  Q$ instead of $andI\ A\ B\ P\ Q$.
+
+
+
+\section{A Description Operator for FOL}
+We extend FOL with the aforementioned $\delta$-operator. It is a term constructor that allows us to obtain from a unary predicate $P(x)$ the unique witness $x$ such that $P(x)$. However, simply defining $\delta$ as an operator from predicates to terms only gives us a partial operator, since it it is only defined on any predicate $F$ for which $\exists!x.F(x)$ is provable. To remedy this situation our $\delta$ takes as a second argument a proof $P$ of the fact $\exists! x\ F(x)$. Since $ ded (\exists! x\ F(x))$ is a type, we obtain a well-typed total operator by making use of dependent type theory.  
+
+\subsection{Syntax and Proof theory}
+
+We include the operator into our syntax by extending our above definition of expressions to (additions underlined):
+
+\begin{definition}[Expressions]\label{def:dfolexpr}\ \\
+%A FOL-\emph{context} is a list of variables.
+%For a signature $\Sigma$ and a context $\Gamma$, the \emph{terms} over $\Sigma$ and $\Gamma$ are formed from the variables in $\Gamma$, by the constants, the application of function symbols $f\in\Sigma_f$ to terms according to $\arit(f)$, \underline{and by $\delta(F,P)$, given that F is a formula with 1 free variable and P a proof for $\exists! x.F(x)$ }.
+%The \emph{formulas} over $\Sigma$ and $\Gamma$ are formed from the application of predicate symbols $p\in\Sigma_p$ to a number of terms according to $\arit(p)$ as well as $\doteq$, $\true$, $\false$, $\neg$, $\wedge$, $\vee$, $\impl$, $\forall$, and $\exists $ in the usual way.
+%In addition we define $\exists! x.P(x) := \exists z.P(x)\wedge (\forall y. (P(y)\impl y\doteq x))$ as an abbreviation.
+
+\begin{tabular}{ p{1cm}p{1cm}p{8cm}}
+$term$ & ::= & $x$ |$f(\underbrace{term, ... term}_{ar(f)})$\\  
+		& & | \underline{$\delta(form, proof)$} \\	
+$form$ & ::= &  $\neg form$\ |\ $form\wedge form$\ |\ $form\vee form$\\
+		&  & |$form\impl form$\ |\ $term\doteq term$ \\
+       &  & |$true$\ |\ $false$ \\
+        &   &| $\forall x.form$\ |\ $\exists x.form$\\ 
+      
+		&  & $p(\underbrace{term, ... term}_{ar(p)}) |$\\ 
+$proof$ & ::= & \underline{$deltaaxiom$} | ...
+\end{tabular}
+\end{definition}
+\ \\
+The dots in the $proof$ part of the grammar represent exactly the rules from \ref{fol:nd}.
+$deltaaxiom$ is the following rule:
+
+\begin{center}
+\ianc{}
+    {\sgcons{}{F(\delta(F,P))}}
+    {}
+\end{center}
+\footnote{already was begin{center}, needs to be textmode}
+
+Note that we now include proofs in terms. This breaks with the standard hierarchy widespread in logics which is that formulas contain terms but not proofs. However, in LF there is no need for this distinction since proofs themselves are represented as terms, so we can include proofs directly into the grammar of our logic. The two additions to our grammar above can be included into the encoding with the following two declarations. yielding the following additions:\\
+\begin{twelfsig}
+$\delta$ \tcolon $\{A: term \arr form \}\ (ded\ \exists!\ A) \arr term$  & $  \delta\ 1\ 2$ prec 25 \\
+$deltaax$ \tcolon $\{A,P: ded\ (\exists! A)\}\ ded\ (A\ (delta\ A\ P))$ & \\
+\end{twelfsig}
+
+
+We pick up our example from abstract algebra again. Even though the description operator is not strictly necessary, it helps streamline many of the definitions. Below we provide an LF-encoding of basic theories of monoids and groups. 
+
+\begin{example}[Algebra (continued from Ex. 5]\ \\
+\begin{tabular}{p{3.3cm}p{0.2cm}p{8cm}}\\
+extends FOLd with& &  \\
+$\ast$ & : & $term \rightarrow term \rightarrow term $\\
+$assoc$ & : & $ded$\ $\forall x. \forall y. \forall z.\; (x\ast y)\ast z\doteq x\ast (y \ast z)$\\
+$unitexists$ & : & $ded$\   $\exists e.\forall x.\; e\ast x \doteq x \wedge x\ast e\doteq x$ \\
+$unitunique$ & : & $ded\ \exists! e \forall x.\; e\ast x \doteq x \wedge x\ast e\doteq x =  \dots$\\
+$e$ & : & $\delta\ ([x]\forall y. x\ast y \doteq y \wedge y\ast x\doteq y)\ unitunique$\\
+
+\end{tabular}\\
+This provides the definition of a monoid ($unitunique$ is a proof for the uniqueness of the unit in a monoid, given at \footnote{add link to encoding}).\\
+
+Further, we obtain the theory group by extending the above with the following declarations:\\
+\begin{tabular}{ p{3cm}p{0.2cm}p{8cm}} 
+$invexists$ & : & $\forall x.\exists y .\; x\ast y \doteq e$ \\
+$invunique$ & : &  ded$\ \{x\} \exists! y.\ x\ast y \doteq e$\\
+$inv$ & : & $term$ $\rightarrow term$ $\; \; =  \{x\}\  \delta ([y]\ y\ast x\doteq e)\ unqinv$
+\end{tabular}\\
+This adds the inverses to the monoid definiton to obtain groups.
+
+Note that in both cases (unit and inverse) we did not have to define the objects as primitive symbols, but obtained it using the existence axiom. This is a recurring theme, as in a lot of mathematical theories we postulate the existence of an object, and prove uniqueness from its properties. In these situations, the use of the $\delta$-operator is very natural. 
+\end{example}\
+
+We need to show that introducing proofs into terms does not affect the semantics.
+\begin{theorem}[Proof Irrelevance]
+Given a fomula $F$ and proofs $P,P'$ of $\exists!x.F(x)$ $\delta(F,P)\doteq \delta(F,P')$.
+\end{theorem}
+\begin{proof}
+The proof for this is straightforward: by our axiom-scheme we have $F(\delta(F,P))\wedge F(\delta(F,P'))$. $P$ is already a proof for $\exists!x.F(x)$ which is equivalent to $\exists x.F(x)\wedge (F(x)\wedge F(t)\impl x\doteq t)$. Implication elimination on the second part of this, using the conjunction above gives us exactly the desired result.
+\end{proof}
+The LF encoding of this proof can be found at \url{https://svn.kwarc.info/repos/supervision/gr/2014/luecke_timo/project/FOLd} \footnote{not yet}. %link
+
+\subsection{Model Theory}
+
+The only addition to the model theory is the interpretation of $\delta(F,P)$:\\
+\begin{itemize}
+\item $I^\alpha(\delta(F,P)) = u$, where $u\in U$ s.t.$I^{\alpha,[u/x]}(F)=1$.
+\end{itemize}
+
+\begin{theorem}
+The interpretation function is well-defined and the resulting logic is sound.
+\end{theorem}
+
+\begin{proof}
+We prove these two statements by a mutual induction over the structure of expressions: \\
+For both statements, the cases that do not include $\delta$-terms are just like in the proofs for the corresponding statements in standard FOL, which are well studied. These serve as induction hypotheses.
+For the well-definedness of  $I^\alpha(\delta(F,P))$ the IH for soundness yields that there is exactly one $u\in U$ s.t.$I^{\alpha,[u/x]}(F)=1$.
+For the soundness of the proof rule we have to show that $I^\alpha(F(\delta(F,P)))=1$. This holds due to the interpretation of $\delta$.\
+\end{proof}
+
+\section{A Formalization of Set Thery}
+
+In this section we present a formalization of the basic concepts of set theory, focusing on the definitions for which the description operator is relevant. We leave out some syntax that in LF serves to support the parser, but would only hurt readability here.\\
+
+\begin{listing}
+theory Sets : http://cds.omdoc.org/urtheories?LF = \\
+  include ?FOLd\\
+  implchain : {A,B,C} ded (A $\Rightarrow$ B) $\rightarrow$ ded(B $\Rightarrow$ C) $\rightarrow$ ded(A $\Rightarrow$C) \\
+  	= [A,B,C][p: ded A $\Rightarrow$ B][q: ded B $\Rightarrow$ C] impI [x: ded A] impE q (impE p x)\\
+  \\
+  equivchain: {A,B,C} ded (A $\Leftrightarrow$ B) $\rightarrow$ ded(B $\Leftrightarrow$ C) $\rightarrow$ ded(A $\leftrightarrow$ C) \\
+  = [A,B,C][p: ded A $\Leftrightarrow$ B, q: ded B $\Leftrightarrow$C] \\
+  equivI ([x: ded A] equivEl q (equivEl p x))\\
+  		 ([y: ded C] equivEr p (equivEr q y))\\
+\\
+  equivsym: {A,B} ded (A $\Leftrightarrow$ B) $\rightarrow$ ded (B $\Leftrightarrow$ A) \\
+  = [A,B][p] \\
+  equivI ([x] equivEr p x)\\
+         ([x] equivEl p x)\\
+\end{listing}
+
+These are some abbreviations to make the rest of the encoding better readable. They signify, in order, transitivity of implication and transitivity+symmetry of equivalence.
+\begin{listing}
+\\
+  in : i $\rightarrow$ i $\rightarrow$ form \# 1 $\in$ 2\\
+  subset: i $\rightarrow$ i $\rightarrow$ form = [A,B] forall ([x] ((x ‍∈ A) $\Rightarrow$ (x ‍∈ B)))\\
+  \\
+  extensionality : {x,y} ded (forall [z] (in z x) $\Leftrightarrow$ (in z y))  →  ded x == y\\
+  \\
+  isempty : i $\rightarrow$ form = [x]  ¬ exists [y] in y x\\
+  emptyAx : ded exists [x] isempty x\\
+  empty : i= delta ([x] isempty x) \\
+             (exUI emptyAx \\
+              ([A,B] [P: ded isempty A, Q: ded isempty B] faI ([x] a))) \\
+  	
+  ispowerset: i $\rightarrow$ i $\rightarrow$ form = [A,B]	forall [x] ((subset x A)  $\Leftrightarrow$ (in x B))	\\		
+  powersetAx: ded forall [A] exists [B] ispowerset A B   \\
+  powerset: i $\rightarrow$ i = [A] delta ([P] ispowerset A P) \\
+  					(exUI (faE powersetAx A)\\
+  					([U,V] [Q: ded ispowerset A U, R: ded ispowerset A V]\\
+  					extensionality (faI [x] (equivchain (equivsym (faE Q x)) (faE R x) ))))\\
+  
+  isunion: i $\rightarrow$ i $\rightarrow$ form= [A, U]	forall [x] ((exists ([a] (a ‍∈ A) ∧ (x ‍∈ a))) $\Leftrightarrow$ in x\\ U)			\\
+  unionAx: ded forall [A] exists [U] (isunion A U)\\
+  union: i $\rightarrow$ i = \\
+  			\ 	[A] delta ([U] isunion A U)\\
+  				(exUI (faE unionAx A) (\\
+  		\ 		[U,V, P: ded isunion A U, Q: ded isunion A V]\\
+  				extensionality (faI [x] (equivchain (equivsym (faE P x)) (faE Q x) ))))\\
+   					
+  comprehensionAx: {A,F:i $\rightarrow$ form} ded exists [C] forall [x] ((x ‍∈ C) $\Leftrightarrow$ ((x ‍∈ A) ∧ (F x)))\\
+  \\
+  ispairof: i $\rightarrow$ i $\rightarrow$ i $\rightarrow$ form= [a,b,J] forall [z] (z == a ∨ z == b) $\Leftrightarrow$ (in z J)\\
+  unpairAx: ded forall[x] forall[y] exists [A] ispairof x y A   \\
+  unpair: i $\rightarrow$ i $\rightarrow$ i= [a,b] delta ([J] ispairof a b J) \\
+  				(exUI (faE(faE unpairAx a) b) (\\
+  		\ 		[J,K, P: ded ispairof a b J, Q: ded ispairof a b K]\\
+  				extensionality (faI [x] (equivchain (equivsym (faE P x)) (faE Q x) ))))\\
+   				\\
+  binunion : i $\rightarrow$ i $\rightarrow$ i = [x][y] union (unpair x y)\# 1 ∪ 2\\
+  singleton : i $\rightarrow$ i = [x] unpair x x\\
+\\
+\end{listing}
+There are a couple of things to note here. First of all, notice that we need significantly less primary definitions than we  would if we would be working without the description operator. empty, powerset, union, and unpair would all have to be primary definitions otherwise. Additionally, our development mirrors mathematical practice by showing uniqueness of the objects out of the properties, which is especially prevalent in many introductions to set theory. Also note that, after defining abbreviations for the properties, the proofs look very similar to each other. This might be helpful in developing tool support for these proofs in the future.
+ % zero: i  = empty\\
+ % succ: i $\rightarrow$ i  = [x] x ∪ (singleton x)\\
+%  natnumAx: ded exists [N] (in zero N) ∧ (forall [x] (in x N) $\Rightarrow$ (in (succ(x)) N))\\
+
+\section{Meta-Logical Properties}
+
+It is well-known that a description operator can in principle be eliminated by translating into pure FOL. We spell out such a translation for our formalization now. This also allows us to recover completeness w.r.t. the standard set-theoretical semantics. It is additionally motivated by the large amount of tool support that has been developed for FOL over the last decades. 
+
+The basic idea for the translation is first replacing the $\delta$-terms with corresponding unique existence clauses that bind variables to the values of the $\delta$-terms and then replacing these in the formula.
+
+We first need an auxiliary definition:
+\begin{definition}[simple $\delta$-terms]\ \\
+We call $t$ a \textit{simple $\delta$-term} if it is of the form $\delta(F,P)$ and $F$ contains no $\delta$-terms.
+\end{definition}
+  
+\begin{definition} 
+For any signature $\Sigma$ we define a mapping $\sigma_\Sigma$ from $FOL^\delta\Sigma$ formulas to $FOL_\Sigma$\footnote{is it really the same sigma?} formulas. The definition proceeds by induction over formulas. The only non-trivial case is the one for atomic formulas $F=p(t_1,..., t_n)$, where we distinguish two cases:
+
+\begin{itemize}
+\item If all occurring $\delta$-terms are simple, we define, assuming $p$ contains the $\delta$-terms $\delta(F_1,Q_1)\dots \delta(F_k,Q_k)$
+\[
+\sigma(p(t_1\dots t_n)):= \exists!x_1.F_1(x_1)\wedge \exists!x_2.F_2(x_2)\dots \exists!x_k.F_k(x_k)\wedge [x_i/\delta(F_i,P_i)]F(t_1\dots t_n)
+\]
+
+\item If $p$ contains $\delta$-terms which aren't simple, we define 
+\[
+\sigma(F)=\sigma(F'),\] 
+where $F'$ is obtained by replacing all occurrences of $\delta$-terms $\delta(F_i,P_i)$ by $\delta(\sigma(F_i),P_i)$
+\end{itemize}
+We then define $\sigma(A\wedge B) := \sigma(A)\wedge \sigma(B)$ and correspondingly for the other connectives.\\
+
+\end{definition}
+
+\begin{example}[continued from ??]\ \\
+Consider the following sentence from our theory of monoids:
+$\sigma( x \ast e\doteq x)\\
+= \sigma(x \ast \delta\ ([x]\forall y. x\ast y \doteq y \wedge y\ast x\doteq y)\ (unitunique) \doteq x\\
+= \exists! t. (\forall y. t\ast y \doteq y \wedge y\ast t\doteq y)\wedge  x\ast t\doteq x$\\
+This sentence is now in pure FOL and semantically equivalent to the original sentence.\footnote{work out inv inv x ==e}\\
+For a second example containing nested $\delta$-terms, we consider a formula from the theory of groups:\\
+$\sigma( inv\ x\doteq y) \\
+= \sigma(\ (\delta\ ([b]\ b\ast x \doteq 
+(\delta\ ([a] \forall [z] a\ast z \doteq z )\ P)\doteq e)\  Q) \doteq y) \\
+= \sigma(\ (\delta\ ([b] \sigma(\ b\ast x \doteq 
+(\delta\ ([a] \forall [z] a\ast z \doteq z )\ P))\doteq e)\  Q) \doteq y) \\
+=\sigma(\ (\delta\ (\exists! t. (\forall z. t\ast z\doteq z)\wedge b\ast x\doteq t)\doteq e)\  Q') \doteq y)\\
+=\exists! s. (\exists! t. (\forall z. t\ast z\doteq z)\wedge s\ast x\doteq t)\doteq e)\wedge s\doteq e
+$\footnote{check}
+\end{example}
+
+%The description above leaves out one potential problem: the predicates in the $\delta$-terms may contain $\delta$-terms themselves. 
+%However, they can only be finitely nested, so we can just reapply $\sigma$ until it is idempotent. We will call this transitive closure of $\sigma$ $\psi$.
+
+\begin{theorem}
+For any $\Sigma,\ \vdash^{FOL^\delta}_{\Sigma} A\iff \sigma(A)$
+\end{theorem}
+\begin{proof}
+The general statement follows immediately if we prove it for atomic formulas. More specifically, we only need to consider the case without nested $\delta$-terms, since the nested-$\delta$ case would follow (the translation on the $\delta$-free formulas at the bottom of any nesting are semantics-preserving and turn the translations of the next level into one of $\delta$-free atomic formulas).
+
+So, using the situation from Def. 22 we have to show:\\
+$ F(t_1\dots t_n)\iff \exists!x_1.F_1(x_1)\wedge \exists!x_2.F_2(x_2)\dots \exists!x_k.F_k(x_k)\wedge [x_i/\delta(F_i,P_i)]F(t_1\dots t_n)$\\
+The unique existence clauses are equivalent to the well-formedness of the $\delta$-terms. Additionally, we can easily show that $x_i=\delta(F_i,Q_j)$, since we know $F_i(x_i)$ and $x_i$ is unique, and together with the $\delta ax$ this gives us equality.
+This implies that, given the unique existence clauses, $F(t_1\dots t_n)\iff [x_i/\delta(F_i,P_i)] F(t_1\dots t_n)$.
+\end{proof}
+
+
+
+\begin{theorem}[Model Theoretical Preservation]
+For any assignment $I^\alpha (F)=1$ in FOL\textsuperscript{$\delta$} iff $I^\alpha (\sigma(F))=1$ in FOL.
+\end{theorem}
+\begin{proof}
+From our theorem above we can conclude that $I^\alpha (A)=1$ in FOL\textsuperscript{$\delta$} iff $I^\alpha (\sigma(A))=1$ in FOL\textsuperscript{$\delta$}. However, since $\sigma(A)$ does not contain any $\delta$-terms, and since the interpretation function is the exact same for FOL and FOL\textsuperscript{$\delta$} aside from the $\delta$-terms, $I^\alpha (\sigma(A))=1$ in FOL\textsuperscript{$\delta$} iff $I^\alpha (\sigma(A))=1$ in FOL. 
+\end{proof} 
+
+Note that this also gives us the completeness of FOL\textsuperscript{$\delta$}:
+\begin{theorem}[Completeness of FOL\textsuperscript{$\delta$}]
+FOL\textsuperscript{$\delta$} is complete.
+\end{theorem} 
+\begin{proof}
+We have shown the equivalence of any sentence in FOL\textsuperscript{$\delta$} to sentences that are in FOL. FOL itself is complete, and any FOL-proof is also a proof in FOL\textsuperscript{$\delta$}, since the deduction rules of FOL are a subset of the ones of FOL\textsuperscript{$\delta$}.
+\end{proof}
+
+
+\section{Conclusion}
+
+
+We have presented a sound and complete extension of FOL with a description operator, and have described a semantics-preserving translation into FOL. We have demonstrated its usefulness by giving a natural formalization of some parts of algebra and basic set theory. FOL\textsuperscript{$\delta$} greatly facilitates authoring first-order theories in a way that stays close to standard math vernacular.
+
+Future work will focus on tool support, especially for editing, theorem proving and automating the translation.
+Moreover, the same techniques applied here can be applied to extend FOL with a choice operator or partial functions.
+
+
+\begin{thebibliography}{10}
+\bibitem{FOLsound} F. Horozal, F. Rabe, \textit{Representing Model Theory in a Type-Theoretical Logical Framework}, Theoretical Computer Science, vol. 412, 2011, p. 4919-4945 
+\bibitem{mmt} F. Rabe, M. Kohlhase, \textit{A Scalable Module System}, Information and Computation vol. 230, 2013, p. 1-54
+\bibitem{martinlof}  P. Martin-L{\"o}f \textit{On the Meanings of the Logical Constants and the Justifications of the Logical Laws},
+ Nordic Journal of Philosophical Logic, vol. 1, 1996, p. 3-10
+\bibitem{curryhoward} W. Howard, \textit{The formulas-as-types notion of construction}, To H.B. Curry: Essays on Combinatory Logic, Lambda-Calculus and Formalism, ed. J. Seldin and J. Hindley, Academic Press, 1980, p. 479-490
+
+\bibitem{lf} R. Harper, F. Honsell, G. Plotkin, \textit{A framework for defining logics}, Journal of the Association for Computing Machinery,
+  vol. 40, 1993,  p. 143-184.
+\bibitem{tptp}G. Sutcliffe and C. Suttner,
+        \textit{The {TPTP} Problem Library: CNF Release v1.2.1},
+    Journal of Automated Reasoning, vol. 21, nr. 2, 1998, p.177-203.
+    
+\bibitem{casl} CoFI (The Common Framework Initiative),\textit{CASL Reference Manual}, 2004, Springer, LNCS, vol.2960.
+
+\bibitem{dfol} F. Rabe, \textit{First-Order Logic with Dependent Types}, in \textit{Proceedings of the 3rd International Joint Conference on Automated Reasoning},
+ eds. N. Shankar and U. Furbach, 2006, Lecture Notes in Computer Science,
+ vol. 4130,
+ p. 377--391.
+\bibitem{dfoltrans} K. Sojakova and F. Rabe,
+ \textit{Translating Dependently-Typed Logic to First-Order Logic} in \textit{Recent Trends in Algebraic Development Techniques}, eds. A. Corradini and U. Montanari , 2009,
+ vol. 5486, p. 326--341.
+
+\bibitem{churchtypes} A. Church, \textit{A Formulation of the Simple Theory of Types}, Journal of Symbolic Logic, 1940 vol.5, p. 56--68.
+
+\bibitem{lpf} H. Barringer, J.H. Cheng, C.B. Jones, \textit{A Logic Covering Undefinedness in Program Proofs}, Acta Informatica, 1984, vol. 21, p. 251--269.
+
+\end{thebibliography}
+\end{document}
