@@ -15,7 +15,7 @@ theory Sets : http://cds.omdoc.org/urtheories?LF =
   equivI ([x] equivEr p x)
          ([x] equivEl p x)
 
-  in : i → i → form # 1 ‍∈ 2 
+  in : i → i → form # 1 ‍∈ 2 prec 50
   subset: i → i → form = [A,B] forall ([x] ((x ‍∈ A) ⇒ (x ‍∈ B)))
   
   extensionality : {x,y} ded (forall [z] (in z x) ⇔ (in z y))  →  ded x == y
@@ -24,7 +24,10 @@ theory Sets : http://cds.omdoc.org/urtheories?LF =
   emptyAx : ded exists [x] isempty x
   empty : i= delta ([x] isempty x) 
              (exUI emptyAx 
-              ([A,B] [P: ded isempty A, Q: ded isempty B] faI ([x] a)))  
+              ([A,B] [P: ded isempty A, Q: ded isempty B] 
+              extensionality faI ([z] equivI 
+                ([p: ded z ‍∈ A] contraE (negE P (exI z p) ) )
+                ([q: ded z ‍∈ B] contraE (negE Q (exI z q) ) ))))  
   	
   ispowerset: i → i → form = [A,B]	forall [x] ((subset x A)  ⇔  (in x B))			
   powersetAx: ded forall [A] exists [B] ispowerset A B   
@@ -56,8 +59,6 @@ theory Sets : http://cds.omdoc.org/urtheories?LF =
   zero: i  = empty
   succ: i → i  = [x] x ∪ (singleton x)
   natnumAx: ded exists [N] (in zero N) ∧ (forall [x] (in x N) ⇒ (in (succ(x)) N))
-  
- 
-  // same for union : i → i = [x] delta ..., power set, unordered pair, comprehension, replacement, natural numbers
+
 
 

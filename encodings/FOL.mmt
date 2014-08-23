@@ -8,7 +8,7 @@ theory FOL : http://cds.omdoc.org/urtheories?LF =
   i 	: type 
   ded   : form → type          # ded 1  prec 0role Judgment
   contra : type  = {a} ded a # ↯            
-  contraE : {A} ↯ → ded A = [A,c] c A
+  contraE : {A} ↯ → ded A = [A,c] c A# contraE 2
   
   eq 	: i → i → form # 1 == 2 prec 25 
   true  : form                                  
@@ -49,7 +49,7 @@ theory FOLNatDed : http://cds.omdoc.org/urtheories?LF =
   impE  : {A,B} ded A ⇒ B → ded A → ded B   
 
   negI  : {A} (ded A → ↯) → ded ¬ A   
-  negE  : {A} ded ¬ A → ded A → ↯     
+  negE  : {A} ded ¬ A → ded A → ↯  # negE 2 3   
 
   equivI : {A,B} (ded A → ded B) → (ded B → ded A) → ded A ⇔ B  
          = [A,B,p,q] andI (impI [x:ded A] p x) (impI [x] q x)  
@@ -63,7 +63,7 @@ theory FOLNatDed : http://cds.omdoc.org/urtheories?LF =
   faI :  {A} ({x: i} ded (A x)) → ded (forall [x] A x)          
   faE :  {A} ded (forall [x: i] A x) → {c:i} ded (A c)  
     
-  exI : {A,c} ded (A c) → ded exists [x] A x 
+  exI : {A,c} ded (A c) → ded exists [x] A x# exI 2 3 
   exE : {A,B} ded (exists [x] A x) → ({c} ded (A c) → ded B) → ded B  
 
   exUI : {A} ded (exists [x] A x) → ({x,y} ded (A x) → ded (A y) → ded x == y) → ded existsU [x] A x
