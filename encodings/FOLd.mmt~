@@ -9,7 +9,7 @@ theory FOLd : http://cds.omdoc.org/urtheories?LF =
 
   proofir : {A: i → form,P: ded existsU [x] A x, Q: ded existsU [y] A y} ded (delta A P) == (delta A Q)
   				
-  = [A,P,Q]  (impE  (impE (faE (faE (andEr (exUE P)) (delta A P)) delta A Q) (deltaax A P)) deltaax A Q)   
+  = [A,P,Q]  (impE  (impE (faE (faE (andEr (exUE P)) (delta A P)) (delta A Q)) (deltaax P)) (deltaax Q))   
 
   				
 

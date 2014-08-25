@@ -1,0 +1,39 @@
+namespace http://cds.omdoc.org/GR
+
+theory Monoid : http://cds.omdoc.org/urtheories?LF =        
+  include ?FOLd
+  comp : i → i → i		# 1 ∗ 2 prec 15
+
+  assoc : {a,b,c} ded ((a ∗ b) ∗ c) == (a ∗ (b ∗ c)) # assoc 1 2 3
+  appeq : {x,y,a,b} ded (x==y) → ded (a==b) → ded (x ∗ a) == (y ∗ b)
+
+  
+
+  isunit: i → form= [e] forall[x] ((e ∗ x)== x) ∧ ((x ∗ e) == x) 
+  unitex : ded exists [x] isunit x
+  unitunique : {x,y} (ded isunit x) → ((ded isunit y) → (ded (x==y))) =
+        [x, y] [P: ded isunit x, Q: ded isunit y] 
+        eqtrans (eqsym (eqtrans (eqref (x ∗ y)) (andEl (faE P y)))) (andEr (faE Q x))       
+ 
+  e : i = delta ([x] isunit x) (exUI unitex unitunique)
+  unitcomp : {a} ded ((e ∗ a) == a) ∧ ((a ∗ e) == a)
+// = deltaax
+
+
+
+ theory Group : http://cds.omdoc.org/urtheories?LF = 
+  include ?Monoid
+  isinv :  {x,y} i → i → form= [x,y] ((x ∗ y) == e) ∧ (y ∗ x ==e)
+  invex : ded forall [x] exists [y] (x ∗ y) == e
+  invunique : {x, y} {a} ded isinv a x → (ded isinv a y → ded x==y)=
+      [a] [x,y] [P: ded isinv a x, Q: ded isinv a y] 
+        eqsym (eqtrans (eqtrans 
+         (eqsym (eqtrans (eqtrans  (assoc x a y) (appeq (eqref x) andEl Q)) (andEl unitcomp y)))
+         (appeq (andEr P) (eqref y)) ) (andEr unitcomp x))
+
+      
+      
+  inv : i → i= [a] delta ([x] isinv a x) invunique
+
+ 
+
